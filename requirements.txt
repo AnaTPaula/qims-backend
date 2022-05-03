@@ -1,0 +1,5 @@
+flask==2.1.1
+werkzeug==2.1.1
+connexion[swagger-ui]==2.13.0
+SQLAlchemy==1.4.35
+psycopg2==2.9.3
