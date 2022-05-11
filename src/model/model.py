@@ -38,7 +38,7 @@ class Estoque(Base):
         }
 
 
-class Localizacao()
+class Localizacao(Base):
     __tablename__ = 'localizacao'
 
     id = Column(Integer, primary_key=True)
@@ -58,7 +58,7 @@ class Localizacao()
         }
 
 
-class Material()
+class Material(Base):
     __tablename__ = 'material'
 
     id = Column(Integer, primary_key=True)
@@ -80,7 +80,7 @@ class Material()
         }
 
 
-class Usuario()
+class Usuario(Base):
     __tablename__ = 'usuario'
 
     id = Column(Integer, primary_key=True)
@@ -99,9 +99,11 @@ class Usuario()
             'nome_usuario': self.nome_usuario
         }
 
-class Empresa()
+
+class Empresa(Base):
     __tablename__ = 'empresa'
 
+    usuario_fk = Column(Integer, primary_key=True)
     tipo_armazenagem = Column(String(4), nullable=False)
     conta = Column(String(50), nullable=False)
     estado_conta = Column(String(10), nullable=False)
@@ -117,9 +119,11 @@ class Empresa()
 
         }
 
-class Funcionario()
+
+class Funcionario(Base):
     __tablename__ = 'funcionario'
 
+    usuario_fk = Column(Integer, primary_key=True)
     conta = Column(String(50), nullable=False)
     acesso = Column(String(20), nullable=False)
 
