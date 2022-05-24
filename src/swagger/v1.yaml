@@ -42,7 +42,124 @@ paths:
               $ref: "#/definitions/almoxarifado"
         "401":
           description: "Unauthorized"
+    post:
+      x-swagger-router-controller: controller.almoxarifado
+      operationId: post
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Almoxarifado que sera adicionado"
+          required: true
+          schema:
+            $ref: '#/definitions/almoxarifado'
+      responses:
+        "201":
+          description: "Criado"
+          schema:
+            $ref: '#/definitions/almoxarifado'
+        "400":
+          description: "Request Inválida"
+        "401":
+          description: "Não autorizado"
 
+  /conta/{conta}/almoxarifado/{almoxarifado_id}:
+    options:
+      x-swagger-router-controller: controller.common
+      operationId: options_id
+      produces:
+        - "application/json"
+      parameters:
+        - in: "path"
+          name: "conta"
+          required: true
+          type: "string"
+        - name: "almoxarifado_id"
+          in: "path"
+          required: true
+          type: "string"
+      summary: CORS suporte
+      description: Habilita o CORS retornando os cabeçalhos corretos
+      responses:
+        200:
+          description: Metodo generico para CORS
+    get:
+      x-swagger-router-controller: controller.almoxarifado
+      operationId: get
+      produces:
+        - "application/json"
+      parameters:
+        - name: "conta"
+          in: "path"
+          required: true
+          type: "string"
+        - name: "almoxarifado_id"
+          in: "path"
+          required: true
+          type: "string"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/almoxarifado"
+        "401":
+          description: "Não autorizado"
+        "404":
+          description: "Não encontrado"
+    put:
+      x-swagger-router-controller: controller.almoxarifado
+      operationId: put
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "conta"
+          in: "path"
+          required: true
+          type: "string"
+        - name: "almoxarifado_id"
+          in: "path"
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: "#/definitions/almoxarifado"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/almoxarifado"
+        "400":
+          description: "Dados Inválidos"
+        "401":
+          description: "Não autorizado"
+    delete:
+      x-swagger-router-controller: controller.almoxarifado
+      operationId: delete
+      produces:
+        - "application/json"
+      parameters:
+        - name: "conta"
+          in: "path"
+          required: true
+          type: "string"
+        - name: "almoxarifado_id"
+          in: "path"
+          required: true
+          type: "string"
+      responses:
+        "200":
+          description: "OK"
+        "400":
+          description: "Dados Inválidos"
+        "401":
+          description: "Não autorizado"
 definitions:
   almoxarifado:
     type: "object"
