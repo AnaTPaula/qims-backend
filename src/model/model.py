@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Float, ForeignKey, Boolean, UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
+from datetime import datetime
 
 Base = declarative_base()
 
@@ -10,8 +11,8 @@ class Usuario(Base):
 
     id = Column(Integer, primary_key=True)
     tipo = Column(String(15), nullable=False)
-    senha = Column(String(50), nullable=False)
-    data_cadastro = Column(Integer, nullable=False)
+    senha = Column(String(300), nullable=False)
+    data_cadastro = Column(Integer,default=int(datetime.utcnow().timestamp()),nullable=False)
 
     @property
     def serialize(self):

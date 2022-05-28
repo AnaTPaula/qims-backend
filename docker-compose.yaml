@@ -1,11 +1,5 @@
 version: '3.4'
 services:
-  app:
-    image: python-flask-base:1.0.0
-    container_name: python-flask-base
-    ports:
-      - 8000:8000
-
   db:
     image: postgres
     restart: always
