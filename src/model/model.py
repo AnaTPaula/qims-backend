@@ -1,7 +1,9 @@
+from datetime import datetime
+
+from passlib.hash import pbkdf2_sha256
 from sqlalchemy import Column, Integer, String, Float, ForeignKey, Boolean, UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
-from datetime import datetime
 
 Base = declarative_base()
 
@@ -11,8 +13,8 @@ class Usuario(Base):
 
     id = Column(Integer, primary_key=True)
     tipo = Column(String(15), nullable=False)
-    senha = Column(String(300), nullable=False)
-    data_cadastro = Column(Integer,default=int(datetime.utcnow().timestamp()),nullable=False)
+    senha = Column(String(300), nullable=False)  # limitar tamanho senha em 50
+    data_cadastro = Column(Integer, default=int(datetime.utcnow().timestamp()), nullable=False)
 
     @property
     def serialize(self):
@@ -21,6 +23,15 @@ class Usuario(Base):
             'tipo': self.tipo,
             'dataCadastro': self.data_cadastro
         }
+
+    def verify_password(self, senha_sem_hash: str):
+        try:
+            return pbkdf2_sha256.verify(senha_sem_hash, self.senha)
+        except ValueError:
+            return False
+
+    def set_hash_password(self, senha: str):
+        self.senha = pbkdf2_sha256.hash(senha)
 
 
 class Empresa(Base):
@@ -49,6 +60,12 @@ class Empresa(Base):
             **self.usuario.serialize
         }
 
+    def set_hash_password(self, senha: str):
+        self.usuario.set_hash_password(senha)
+
+    def verify_password(self, senha_sem_hash: str):
+        return self.usuario.verify_password(senha_sem_hash)
+
 
 class Funcionario(Base):
     __tablename__ = 'funcionario'
@@ -71,6 +88,12 @@ class Funcionario(Base):
             **self.usuario.serialize
         }
 
+    def set_hash_password(self, senha: str):
+        self.usuario.set_hash_password(senha)
+
+    def verify_password(self, senha_sem_hash: str):
+        return self.usuario.verify_password(senha_sem_hash)
+
 
 class Administrador(Base):
     __tablename__ = 'administrador'
@@ -89,6 +112,12 @@ class Administrador(Base):
             'nomeUsuario': self.nome_usuario,
             **self.usuario.serialize
         }
+
+    def set_hash_password(self, senha: str):
+        self.usuario.set_hash_password(senha)
+
+    def verify_password(self, senha_sem_hash: str):
+        return self.usuario.verify_password(senha_sem_hash)
 
 
 class Almoxarifado(Base):
@@ -202,11 +231,10 @@ class Historico(Base):
 
     id = Column(Integer, primary_key=True)
     empresa_fk = Column(Integer, ForeignKey('empresa.usuario_fk', ondelete='CASCADE'), nullable=False)
-    # funcionario_fk = Column(Integer, ForeignKey('funcionario.usuario_fk'))
     nome_funcionario = Column(String(50), nullable=False)
     quantidade = Column(Float, nullable=False)
     operacao = Column(String(50), nullable=False)
-    data_hora = Column(Integer, nullable=False)
+    data_hora = Column(Integer, default=datetime.utcnow().timestamp(), nullable=False)
     almoxarifado_fk = Column(Integer, ForeignKey('almoxarifado.id'), nullable=False)
     material_fk = Column(Integer, ForeignKey('material.id'), nullable=False)
 
