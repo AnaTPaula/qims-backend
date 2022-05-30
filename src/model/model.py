@@ -42,10 +42,10 @@ class Empresa(Base):
     def serialize(self):
         return {
             'nomeUsuario': self.nome_usuario,
-            'situacao_conta': self.situacao_conta,
+            'situacaoConta': self.situacao_conta,
             'lingua': self.lingua,
-            'tipo_armazenagem': self.tipo_armazenagem,
-            'aceite_termos_uso': self.aceite_termos_uso,
+            'tipoArmazenagem': self.tipo_armazenagem,
+            'aceiteTermosUso': self.aceite_termos_uso,
             **self.usuario.serialize
         }
 
