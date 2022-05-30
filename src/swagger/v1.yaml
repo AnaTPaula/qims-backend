@@ -456,6 +456,37 @@ paths:
         "404":
           description: "Não encontrado"
 
+  /login:
+    options:
+      x-swagger-router-controller: controller.usuario
+      operationId: options
+      produces:
+        - "application/json"
+      summary: CORS support
+      description: Enable CORS by returning correct headers
+      responses:
+        200:
+          description: Default response for CORS method
+    post:
+      x-swagger-router-controller: controller.usuario
+      operationId: login
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/definitions/login'
+      responses:
+        "200":
+          description: "Autenticado"
+        "400":
+          description: "Request Inválida"
+        "401":
+          description: "Não autorizado"
 
 definitions:
   almoxarifado:
@@ -497,3 +528,12 @@ definitions:
       senha:
         type: "string"
 
+  login:
+    type: "object"
+    properties:
+      tipo:
+        type: "string"
+      senha:
+        type: "string"
+      nome_usuario:
+        type: "string"

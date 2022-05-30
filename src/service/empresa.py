@@ -15,7 +15,8 @@ def get_item(empresa_id: int):
 
 
 def create(body: dict):
-    usuario = Usuario(tipo='empresa', senha=body['senha'])
+    usuario = Usuario(tipo='empresa')
+    usuario.set_hash_password(senha=body['senha'])
     session.add(usuario)
     session.commit()
     item = Empresa(
