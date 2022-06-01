@@ -52,7 +52,7 @@ def delete(empresa_id: int):
         raise ApiError(error_code=404, error_message='Empresa não encontrada')
 
 
-def options(conta: str):
+def options():
     response = make_response('{}', 200)
     response.headers['Access-Control-Allow-Origin'] = config.origin
     response.headers['Access-Control-Allow-Methods'] = 'PUT, GET, DELETE, POST, OPTIONS'
@@ -60,7 +60,7 @@ def options(conta: str):
     return response
 
 
-def options_id(conta: str, empresa_id: int):
+def options_id(empresa_id: int):
     response = make_response('{}', 200)
     response.headers['Access-Control-Allow-Origin'] = config.origin
     response.headers['Access-Control-Allow-Methods'] = 'PUT, GET, DELETE, POST, OPTIONS'

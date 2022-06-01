@@ -30,7 +30,7 @@ def get(empresa_id: str, funcionario_id: int):
 @handler_exception
 def post(empresa_id: str, body: dict):
     logging.info('Criando Funcionario')
-    body['empresa_id'] = empresa_id
+    body['empresaId'] = empresa_id
     response = create(body=body)
     return create_response(response=response, status=201)
 
@@ -38,7 +38,7 @@ def post(empresa_id: str, body: dict):
 @handler_exception
 def put(empresa_id: str, funcionario_id: int, body: dict):
     logging.info('Atualizando Funcionario')
-    body['empresa_id'] = empresa_id
+    body['empresaId'] = empresa_id
     body['id'] = funcionario_id
     response = update(body=body)
     return create_response(response=response, status=200)
@@ -54,7 +54,7 @@ def delete(empresa_id: str, funcionario_id: int):
         raise ApiError(error_code=404, error_message='Funcionario não encontrado')
 
 
-def options(conta: str):
+def options(empresa_id: str):
     response = make_response('{}', 200)
     response.headers['Access-Control-Allow-Origin'] = config.origin
     response.headers['Access-Control-Allow-Methods'] = 'PUT, GET, DELETE, POST, OPTIONS'
@@ -62,7 +62,7 @@ def options(conta: str):
     return response
 
 
-def options_id(conta: str, funcionario_id: int):
+def options_id(empresa_id: str, funcionario_id: int):
     response = make_response('{}', 200)
     response.headers['Access-Control-Allow-Origin'] = config.origin
     response.headers['Access-Control-Allow-Methods'] = 'PUT, GET, DELETE, POST, OPTIONS'

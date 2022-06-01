@@ -54,7 +54,7 @@ def delete(empresa_id: str, almoxarifado_id: int):
         raise ApiError(error_code=404, error_message='Almoxarifado não encontrado')
 
 
-def options(conta: str):
+def options(empresa_id: str):
     response = make_response('{}', 200)
     response.headers['Access-Control-Allow-Origin'] = config.origin
     response.headers['Access-Control-Allow-Methods'] = 'PUT, GET, DELETE, POST, OPTIONS'
@@ -62,7 +62,7 @@ def options(conta: str):
     return response
 
 
-def options_id(conta: str, almoxarifado_id: int):
+def options_id(empresa_id: str, almoxarifado_id: int):
     response = make_response('{}', 200)
     response.headers['Access-Control-Allow-Origin'] = config.origin
     response.headers['Access-Control-Allow-Methods'] = 'PUT, GET, DELETE, POST, OPTIONS'
