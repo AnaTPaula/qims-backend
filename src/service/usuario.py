@@ -7,7 +7,6 @@ from controller.api_helper import ApiError
 from model.model import Administrador, Empresa, Funcionario
 
 config = get_config()
-session = config.get_session()
 
 
 def validate_access(body: dict):
@@ -36,16 +35,26 @@ def generate_auth_token(usuario, exp=60):
 
 
 def get_usuario(body: dict):
+    session = get_config().get_session()
     tipo = body['tipo']
     usuario = None
     if tipo == 'empresa':
-        usuario = session.query(Empresa).filter_by(nome_usuario=body['nome_usuario']).first()
+        usuario = session.query(Empresa).filter_by(nome_usuario=body['nomeUsuario']).first()
     elif tipo == 'funcionario':
-        usuario = session.query(Funcionario).filter_by(nome_usuario=body['nome_usuario']).first()
+        empresa = session.query(Empresa).filter_by(nome_usuario=body['nomeEmpresa']).first()
+        if not empresa:
+            session.close()
+            ApiError(error_code=401, error_message='Senha ou nome de usuário inválidos.')
+
+        usuario = session.query(Funcionario).filter_by(nome_usuario=body['nomeUsuario'],
+                                                       empresa_fk=empresa.usuario_fk).first()
     elif tipo == 'administrador':
-        usuario = session.query(Administrador).filter_by(nome_usuario=body['nome_usuario']).first()
+        usuario = session.query(Administrador).filter_by(nome_usuario=body['nomeUsuario']).first()
     else:
+        session.close()
         ApiError(error_code=401, error_message='Senha ou nome de usuário inválidos.')
     if not usuario:
+        session.close()
         ApiError(error_code=401, error_message='Senha ou nome de usuário inválidos.')
+    session.close()
     return usuario

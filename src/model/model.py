@@ -85,6 +85,7 @@ class Funcionario(Base):
         return {
             'nomeUsuario': self.nome_usuario,
             'acesso': self.acesso,
+            'empresaId': self.empresa_fk,
             **self.usuario.serialize
         }
 
@@ -136,7 +137,8 @@ class Almoxarifado(Base):
         return {
             'id': self.id,
             'nome': self.nome,
-            'descricao': self.descricao
+            'descricao': self.descricao,
+            'empresaId': self.empresa_fk
         }
 
 
