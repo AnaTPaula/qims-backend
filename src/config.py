@@ -1,11 +1,12 @@
 import logging
 from os import getenv
-from model.model import Base
 
 from connexion import App
 from connexion.resolver import RestyResolver
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
+from model.model import Base
 
 
 class Config:

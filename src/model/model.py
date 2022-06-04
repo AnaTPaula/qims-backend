@@ -42,7 +42,7 @@ class Empresa(Base):
     situacao_conta = Column(String(100), nullable=False)
     lingua = Column(String(10), nullable=False)
     tipo_armazenagem = Column(String(5), nullable=False)
-    aceite_termos_uso = Column(Boolean, nullable=False)
+    aceite_termos_uso = Column(Boolean, default=False, nullable=False)
     __table_args__ = (
         UniqueConstraint('nome_usuario', name='_nome_usuario_empresa_uc'),
     )
