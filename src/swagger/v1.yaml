@@ -33,6 +33,10 @@ paths:
           name: "empresa_id"
           required: true
           type: "string"
+        - in: "query"
+          name: "nome"
+          required: false
+          type: "string"
       responses:
         "200":
           description: "Ok"
@@ -191,6 +195,10 @@ paths:
           name: "empresa_id"
           required: true
           type: "string"
+        - in: "query"
+          name: "nome"
+          required: false
+          type: "string"
       responses:
         "200":
           description: "Ok"
@@ -339,6 +347,11 @@ paths:
       operationId: search
       produces:
         - "application/json"
+      parameters:
+        - in: "query"
+          name: "nome"
+          required: false
+          type: "string"
       responses:
         "200":
           description: "Ok"
@@ -496,8 +509,6 @@ definitions:
         type: "integer"
         format: "int64"
       nome:
-        type: "string"
-      descricao:
         type: "string"
   empresa:
     type: "object"

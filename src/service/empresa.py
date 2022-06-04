@@ -1,14 +1,17 @@
 import logging
 
 from config import get_config
-from model.model import Empresa, Usuario
+from model.model import Empresa, Usuario, Funcionario
 from controller.api_helper import ApiError
 
 
-def find():
+def find(nome: str):
     session = get_config().get_session()
     try:
-        items = session.query(Empresa).filter_by().all()
+        if nome:
+            items = session.query(Empresa).filter_by(nome_usuario=nome).all()
+        else:
+            items = session.query(Empresa).filter_by().all()
         return [item.serialize for item in items]
     except Exception as ex:
         logging.error(ex)
@@ -30,6 +33,8 @@ def get_item(empresa_id: int):
 
 
 def create(body: dict):
+    if not is_unique(body=body):
+        raise ApiError(error_code=400, error_message='Nome já existe.')
     session = get_config().get_session()
     try:
         usuario = Usuario(tipo='empresa')
@@ -65,13 +70,15 @@ def create(body: dict):
 
 
 def update(body: dict):
+    if not is_unique(body=body):
+        raise ApiError(error_code=400, error_message='Nome já existe.')
     session = get_config().get_session()
     try:
         item = session.query(Empresa).filter_by(usuario_fk=body['id']).first()
         item.nome_usuario = body['nomeUsuario']
+        item.lingua = body['lingua']
         if body.get('situacaoConta'):
             item.situacao_conta = body['situacaoConta']
-        item.lingua = body['lingua']
         if body.get('senha'):
             item.usuario.set_hash_password(senha=body['senha'])
 
@@ -90,11 +97,31 @@ def remove(empresa_id: int):
     try:
         item = session.query(Usuario).filter_by(id=empresa_id).first()
         if item:
+            funcionarios = session.query(Funcionario).filter_by(empresa_fk=item.id)
+            for funcionario in funcionarios:
+                funcionario = session.query(Usuario).filter_by(id=funcionario.usuario_fk).first()
+                session.delete(funcionario)
+            session.commit()
             session.delete(item)
             session.commit()
         return item
     except Exception as ex:
         logging.error(ex)
         session.rollback()
+    finally:
+        session.close()
+
+
+def is_unique(body: dict):
+    session = get_config().get_session()
+    try:
+        item = session.query(Empresa).filter_by(nome_usuario=body['nomeUsuario']).first()
+        if body.get('id'):
+            return False if item and int(body.get('id')) != item.usuario_fk else True
+        else:
+            return False if item else True
+    except Exception as ex:
+        logging.error(ex)
+        raise ApiError()
     finally:
         session.close()

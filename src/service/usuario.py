@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime, timedelta
 
 import jwt
@@ -10,14 +11,21 @@ config = get_config()
 
 
 def validate_access(body: dict):
-    usuario = get_usuario(body=body)
-    if usuario.verify_password(senha_sem_hash=body['senha']):
-        return {
-            'token': generate_auth_token(usuario),
-            'usuario': usuario.serialize
-        }
-    else:
-        ApiError(error_code=401, error_message='Senha ou nome de usuário inválidos.')
+    session = get_config().get_session()
+    try:
+        usuario = get_usuario(body=body, session=session)
+        if usuario.verify_password(senha_sem_hash=body['senha']):
+            return {
+                'token': generate_auth_token(usuario),
+                'usuario': usuario.serialize
+            }
+        else:
+            ApiError(error_code=401, error_message='Senha ou nome de usuário inválidos.')
+    except Exception as ex:
+        logging.error(ex)
+        raise ex
+    finally:
+        session.close()
 
 
 def generate_auth_token(usuario, exp=60):
@@ -30,12 +38,13 @@ def generate_auth_token(usuario, exp=60):
     if usuario.usuario.tipo == 'funcionario':
         payload_data['empresa'] = usuario.empresa_fk
         payload_data['acesso'] = usuario.acesso
+    if usuario.usuario.tipo == 'empresa':
+        payload_data['situacao'] = usuario.situacao_conta
     token = jwt.encode(payload_data, config.secret, algorithm='HS256')
     return token
 
 
-def get_usuario(body: dict):
-    session = get_config().get_session()
+def get_usuario(body: dict, session):
     tipo = body['tipo']
     usuario = None
     if tipo == 'empresa':
@@ -51,10 +60,7 @@ def get_usuario(body: dict):
     elif tipo == 'administrador':
         usuario = session.query(Administrador).filter_by(nome_usuario=body['nomeUsuario']).first()
     else:
-        session.close()
         ApiError(error_code=401, error_message='Senha ou nome de usuário inválidos.')
     if not usuario:
-        session.close()
         ApiError(error_code=401, error_message='Senha ou nome de usuário inválidos.')
-    session.close()
     return usuario
