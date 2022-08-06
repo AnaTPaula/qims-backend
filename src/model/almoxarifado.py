@@ -38,5 +38,5 @@ def execute_update(item: dict):
 
 
 def execute_delete(empresa_id: str, almoxarifado_id: int):
-    query = f"DELETE FROM almoxarifado WHERE empresa_fk = '{empresa_id}' id = {almoxarifado_id}"
+    query = f"DELETE FROM almoxarifado WHERE empresa_fk = '{empresa_id}' AND id = {almoxarifado_id}"
     database.execute(query=query)
