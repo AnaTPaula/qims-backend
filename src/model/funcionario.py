@@ -5,7 +5,7 @@ class FuncionarioHelper:
     @staticmethod
     def serialize(item):
         return {
-            'nomeUsuario': item.get('nme_usuario'),
+            'nomeUsuario': item.get('nome_usuario'),
             'acesso': item.get('acesso'),
             'empresaId': item.get('empresa_fk'),
             'usuarioId': item.get('usuario_fk')
