@@ -92,4 +92,5 @@ create table lote(
 create table estoque_lote(
     estoque_fk bigint not null references estoque(id) on update cascade,
     lote_fk bigint not null references lote(id) on update cascade,
+    empresa_fk bigint not null references empresa(usuario_fk) on update cascade on delete cascade,
 );
