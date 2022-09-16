@@ -1,6 +1,6 @@
 from config import database
 
-class FuncionarioHelper:
+class OperadorHelper:
 
     @staticmethod
     def serialize(item):
