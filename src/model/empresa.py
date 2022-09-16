@@ -27,8 +27,8 @@ def query_one(usuario_fk: str):
 
 
 def execute_create(item: dict):
-    query = f" INSERT INTO empresa (nome_usuario, situacao_conta, lingua, tipo_armazenagem," \
-            f" aceite_termos_uso, usuario_fk)VALUES " \
+    query = f" INSERT INTO empresa (nome_usuario, situacao_conta, tipo_armazenagem," \
+            f" aceite_termos_uso, usuario_fk, razao_social)VALUES " \
             f" ('{item['nomeUsuario']}', '{item['situacaoConta']}', '{item['tipoArmazenagem']}', " \
             f" ('{item['aceiteTermosUso']}', '{item['usuarioId']}', '{item['razaoSocial']}'); "
     database.execute(query=query)
@@ -37,7 +37,7 @@ def execute_create(item: dict):
 def execute_update(item: dict):
     query = f" UPDATE empresa SET nome_usuario = '{item['nomeUsuario']}', situacao_conta = '{item['situacaoConta']}', " \
             f" tipo_armazenagem = '{item['tipoArmazenagem']}' " \
-            f" WHERE usuario_fk = '{item['usuarioID']}' "
+            f" WHERE usuario_fk = '{item['usuarioId']}' "
     database.execute(query=query)
 
 
