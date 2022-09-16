@@ -1,36 +1,40 @@
 -- USUARIO
 create table usuario(
     id bigint primary key,
-    tipo character varying(100) not null,
-    senha character varying(100) not null,
-    data_cadastro bigint not null,
+    tipo character varying(15) not null,
+    senha character varying(300) not null,
+    data_cadastro bigint not null default TIMESTAMP(now()),
 );
 
 
 -- ADMINISTRADOR
 create table administrador(
-    usuario_fk bigint not null references usuario(id) on update cascade,
-    nome_usuario character varying(100) not null,
+    usuario_fk bigint primary key references usuario(id) on update cascade on delete cascade,
+    nome_usuario character varying(50) not null,
+    constraint _nome_usuario_administrador_uc unique(nome_usuario)
 );
+
 
 
 -- EMPRESA
 create table empresa(
-    usuario_fk bigint not null references usuario(id) on update cascade,
+    usuario_fk bigint primary key references usuario(id) on update cascade on delete cascade,
     situacao_conta character varying(100) not null,
     tipo_armazenagem character varying(100) not null,
-    aceite_termos_de_uso bit not null,
+    aceite_termos_de_uso boolean not null default false,
     nome_usuario character varying(100) not null,
     razao_social character varying(100) not null,
+    constraint _nome_usuario_empresa_uc unique(nome_usuario)
 );
 
 
 -- OPERADOR
 create table operador(
-    usuario_fk bigint not null references usuario(id) on update cascade,
-    tipo_acesso character varying(100) not null,
-    empresa_fk bigint not null references empresa(id) on update cascade,
+    usuario_fk bigint primary key references usuario(id) on update cascade on delete cascade,
+    tipo_acesso character varying(20) not null,
+    empresa_fk bigint not null references empresa(id),
     nome_usuario character varying(100) not null,
+    constraint _nome_usuario_funcionario_uc unique(nome_usuario, empresa_fk)
 );
 
 
@@ -38,13 +42,14 @@ create table operador(
 create table produto(
     id bigint primary key,
     nome character varying(100) not null,
-    preco numeric(10,2) not null,
-    descricao character varying(100) not null,
-    unidade character varying(100) not null,
-    estoque_minimo integer not null,
-    estoque_maximo integer not null,
-    ponto_reposicao integer not null,
-    empresa_fk bigint not null references empresa(id) on update cascade,
+    preco float not null,
+    descricao character varying(200),
+    unidade character varying(25) not null,
+    estoque_minimo float not null,
+    estoque_maximo float not null,
+    ponto_reposicao float not null,
+    empresa_fk bigint not null references empresa(usuario_fk) on update cascade on delete cascade,
+    constraint _nome_produto_uc unique(nome, empresa_fk)
 );
 
 
@@ -52,32 +57,34 @@ create table produto(
 create table estoque(
     id bigint primary key,
     nome character varying(100) not null,
-    quantidade double not null,
-    descricao character varying(100) not null,
+    quantidade float not null,
+    descricao character varying(200),
     localizacao character varying(100) not null,
     produto_fk bigint not null references produto(id) on update cascade,
+    empresa_fk bigint not null references empresa(usuario_fk) on update cascade on delete cascade,
 );
 
 
 -- HISTORICO
 create table historico(
-    operador_fk bigint not null references operador(id) on update cascade,
+    operador_fk bigint not null references operador(usuario_fk) on update cascade,
     produto_fk bigint not null references produto(id) on update cascade,
     estoque_fk bigint not null references estoque(id) on update cascade,
-    quantidade double not null,
-    empresa_id bigint not null,
+    quantidade float not null,
+    empresa_fk bigint not null references empresa(usuario_fk) on update cascade on delete cascade,
     operacao character varying(100) not null,
-    datahora bigint not null,
+    datahora bigint not null default TIMESTAMP(now()),
 );
 
 
 -- LOTE
 create table lote(
     id bigint primary key,
-    codigo_lote integer not null,
+    codigo_lote character varying(100) not null,
     data_entrada bigint not null,
     data_validade bigint not null,
-    quantidade double not null,
+    quantidade float not null,
+    empresa_fk bigint not null references empresa(usuario_fk) on update cascade on delete cascade,
 );
 
 
