@@ -1,120 +1,96 @@
 -- USUARIO
 create table usuario(
-
     id bigint primary key,
-    tipo character varying(100) not null,
-    senha character varying(100) not null,
-    data_cadastro bigint not null,
-
+    tipo character varying(15) not null,
+    senha character varying(300) not null,
+    data_cadastro bigint not null default TIMESTAMP(now()),
 );
 
 
 -- ADMINISTRADOR
 create table administrador(
-
-    usuario_fk bigint not null references usuario(id) on update cascade,
-    nome_usuario character varying(100) not null,
-
+    usuario_fk bigint primary key references usuario(id) on update cascade on delete cascade,
+    nome_usuario character varying(50) not null,
+    constraint _nome_usuario_administrador_uc unique(nome_usuario)
 );
+
 
 
 -- EMPRESA
 create table empresa(
-
-    -- id bigint primary key,
-    usuario_fk bigint not null references usuario(id) on update cascade,
+    usuario_fk bigint primary key references usuario(id) on update cascade on delete cascade,
     situacao_conta character varying(100) not null,
-    lingua character varying(100) not null,
-    tipo_armazenamento character varying(100) not null,
-    aceite_termos_de_uso bit not null,
+    tipo_armazenagem character varying(100) not null,
+    aceite_termos_de_uso boolean not null default false,
     nome_usuario character varying(100) not null,
     razao_social character varying(100) not null,
-    -- cnpj character varying(18) unique not null,
-
+    constraint _nome_usuario_empresa_uc unique(nome_usuario)
 );
 
 
--- FUNCIONARIO
-create table funcionario(
-
-    usuario_fk bigint not null references usuario(id) on update cascade,
-    acesso character varying(100) not null,
-    empresa_fk bigint not null references empresa(id) on update cascade,
+-- OPERADOR
+create table operador(
+    usuario_fk bigint primary key references usuario(id) on update cascade on delete cascade,
+    tipo_acesso character varying(20) not null,
+    empresa_fk bigint not null references empresa(id),
     nome_usuario character varying(100) not null,
-
+    constraint _nome_usuario_funcionario_uc unique(nome_usuario, empresa_fk)
 );
 
 
--- MATERIAL
-create table material(
-
+-- PRODUTO
+create table produto(
     id bigint primary key,
     nome character varying(100) not null,
-    preco numeric(10,2) not null,
-    descricao character varying(100) not null,
-    unidade character varying(100) not null,
-    empresa_fk bigint not null references empresa(id) on update cascade,
-
-);
--- alter table material add constraint ck_preco_material check( preco >= 0);
-
-
--- ESTRUTURA MATERIAL
-create table estruturaMaterial(
-
-    material_pai_fk bigint not null references material(id) on update cascade,
-    material_filho_fk bigint not null references material(id) on update cascade,
-
-);
-
-
--- ALMOXARIFADO
-create table almoxarifado(
-
-    id bigint primary key,
-    nome character varying(100) not null,
-    descricao character varying(100) not null,
-    empresa_fk bigint not null references empresa(id) on update cascade,
-
-);
-
-
--- HISTORICO
-create table historico(
-
-    funcionario_fk bigint not null references funcionario(id) on update cascade,
-    material_fk bigint not null references material(id) on update cascade,
-    almoxarifado_fk bigint not null references almoxarifado(id) on update cascade,
-    quantidade double not null,
-    conta character varying(100) not null,
-    operacao character varying(100) not null,
-    datahora bigint not null,
-
-);
--- alter table historico add constraint ck_quantidade_historico check( quantidade >= 0);
-
-
--- LOCALIZAÇÃO
-create table localizacao(
-
-    id bigint primary key,
-    corredor character varying(100) not null,
-    coluna character varying(100) not null,
-    nivel character varying(100) not null,
-    vao character varying(100) not null,
-
+    preco float not null,
+    descricao character varying(200),
+    unidade character varying(25) not null,
+    estoque_minimo float not null,
+    estoque_maximo float not null,
+    ponto_reposicao float not null,
+    empresa_fk bigint not null references empresa(usuario_fk) on update cascade on delete cascade,
+    constraint _nome_produto_uc unique(nome, empresa_fk)
 );
 
 
 -- ESTOQUE
 create table estoque(
-
     id bigint primary key,
-    quantidade double not null,
-    almoxarifado_fk bigint not null references almoxarifado(id) on update cascade,
-    localizacao_fk bigint not null references localizacao(id) on update cascade,
-    material_fk bigint not null references material(id) on update cascade,
-
+    nome character varying(100) not null,
+    quantidade float not null,
+    descricao character varying(200),
+    localizacao character varying(100) not null,
+    produto_fk bigint not null references produto(id) on update cascade,
+    empresa_fk bigint not null references empresa(usuario_fk) on update cascade on delete cascade,
 );
--- alter table estoque add constraint ck_quantidade_estoque check( quantidade >= 0);
 
+
+-- HISTORICO
+create table historico(
+    operador_fk bigint not null references operador(usuario_fk) on update cascade,
+    produto_fk bigint not null references produto(id) on update cascade,
+    estoque_fk bigint not null references estoque(id) on update cascade,
+    quantidade float not null,
+    empresa_fk bigint not null references empresa(usuario_fk) on update cascade on delete cascade,
+    operacao character varying(100) not null,
+    datahora bigint not null default TIMESTAMP(now()),
+);
+
+
+-- LOTE
+create table lote(
+    id bigint primary key,
+    codigo_lote character varying(100) not null,
+    data_entrada bigint not null,
+    data_validade bigint not null,
+    quantidade float not null,
+    empresa_fk bigint not null references empresa(usuario_fk) on update cascade on delete cascade,
+);
+
+
+-- ESTOQUE LOTE
+create table estoque_lote(
+    estoque_fk bigint not null references estoque(id) on update cascade,
+    lote_fk bigint not null references lote(id) on update cascade,
+    empresa_fk bigint not null references empresa(usuario_fk) on update cascade on delete cascade,
+);
