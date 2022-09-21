@@ -1,8 +1,14 @@
 import logging
+from datetime import datetime
 from json import dumps
 
-from flask import make_response, abort
+import jwt
+from flask import make_response, abort, request
 from werkzeug.exceptions import HTTPException
+
+from config import get_config
+
+config = get_config()
 
 
 def create_response(response: dict, status: int):
@@ -23,9 +29,59 @@ def handler_exception(func):
             response = func(*args, **kwargs)
         except HTTPException as http_exception:
             raise http_exception
+        except ApiError as api_error:
+            raise api_error
         except Exception as ex:
             logging.error(ex)
             raise ApiError()
         return response
 
     return wrapper
+
+
+def token_required(tipos: list = None, acessos: list = None, validate_empresa: bool = None,
+                   validate_situacao: bool = None, validate_funcionario: bool = None):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            validate_auth_token(jwt_payload=request.headers.get('token'),
+                                tipos=tipos,
+                                acessos=acessos,
+                                validate_empresa=validate_empresa,
+                                validate_situacao=validate_situacao,
+                                validate_funcionario=validate_funcionario,
+                                kwargs=kwargs)
+            response = func(*args, **kwargs)
+            return response
+
+        return wrapper
+
+    return decorator
+
+
+def validate_auth_token(jwt_payload,
+                        tipos,
+                        validate_empresa,
+                        acessos,
+                        validate_situacao,
+                        validate_funcionario,
+                        kwargs):
+    try:
+        payload = jwt.decode(jwt_payload, config.secret, algorithms=['HS256', ])
+        timestamp = int(datetime.utcnow().timestamp())
+        if timestamp > payload['exp']:
+            raise ApiError(error_code=401, error_message='Token expirado.')
+        if tipos and payload['tipo'] not in tipos:
+            raise ApiError(error_code=401, error_message='Não autorizado.')
+        if validate_empresa and payload.get('empresa', payload.get('id')) != int(kwargs['empresa_id']):
+            raise ApiError(error_code=401, error_message='Não autorizado.')
+        if validate_situacao and payload.get('situacao') not in ['APROVADO']:
+            raise ApiError(error_code=401, error_message='Não autorizado.')
+        if acessos and payload['acesso'] not in acessos:
+            raise ApiError(error_code=401, error_message='Não autorizado.')
+        if validate_funcionario and payload['tipo'] == 'funcionario' and payload['id'] != int(kwargs['funcionario_id']):
+            raise ApiError(error_code=401, error_message='Não autorizado.')
+
+        return payload
+    except Exception as ex:
+        logging.error(ex)
+        raise ApiError(error_code=401, error_message='Não autorizado.')
