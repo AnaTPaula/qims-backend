@@ -1,3 +1,4 @@
+from passlib.handlers.pbkdf2 import pbkdf2_sha256
 from config import database
 
 class UsuarioHelper:
@@ -23,7 +24,7 @@ def query_one(usuario_id: str):
 
 
 def execute_create(item: dict):
-    query = f" INSERT INTO usuario (tipo, senha, data_cadastro) VALUES " \
+    query = f" INSERT INTO usuario (id, tipo, senha, data_cadastro) VALUES " \
             f" ('{item['tipo']}', '{item['senha']}', '{item['dataCadastro']}'); "
     database.execute(query=query)
 
@@ -37,3 +38,14 @@ def execute_update(item: dict):
 def execute_delete(usuario_id):
     query = f" DELETE FROM usuario WHERE id = '{usuario_id}' "
     database.execute(query=query)
+
+
+def verify_password(item: dict, senha_sem_hash: str):
+    try:
+        return pbkdf2_sha256.verify(senha_sem_hash, item['senha'])
+    except ValueError:
+        return False
+
+
+def set_hash_password(item: dict, senha_nova: str):
+    item['senha'] = pbkdf2_sha256.hash(senha_nova)

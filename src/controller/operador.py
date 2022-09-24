@@ -4,24 +4,24 @@ from flask import make_response
 
 from config import get_config
 from controller.api_helper import ApiError, handler_exception, create_response, token_required
-from service.funcionario import find, get_item, create, update, remove
+from service.operador import find, get_item, create, update, remove
 
 config = get_config()
 
 
 @handler_exception
 @token_required(tipos=['empresa'], validate_empresa=True)
-def search(empresa_id: str, nome: str = None):
+def search(empresa_id: str):
     logging.info('Listando Funcionarios')
-    response = find(empresa_id=empresa_id, nome=nome)
+    response = find(empresa_id=empresa_id)
     return create_response(response=response, status=200)
 
 
 @handler_exception
 @token_required(tipos=['empresa'], validate_empresa=True)
-def get(empresa_id: str, funcionario_id: int):
+def get(empresa_id: str, operador_id: int):
     logging.info('Getting Funcionario')
-    response = get_item(empresa_id=empresa_id, funcionario_id=funcionario_id)
+    response = get_item(empresa_id=empresa_id, operador_id=operador_id)
     if response:
         return create_response(response=response, status=200)
     else:
@@ -51,9 +51,9 @@ def put(empresa_id: str, funcionario_id: int, body: dict):
 
 @handler_exception
 @token_required(tipos=['empresa'], validate_empresa=True)
-def delete(empresa_id: str, funcionario_id: int):
+def delete(empresa_id: str, usuario_id: int):
     logging.info('Deletando Funcionario')
-    response = remove(empresa_id=empresa_id, funcionario_id=funcionario_id)
+    response = remove(empresa_id=empresa_id, usuario_id=usuario_id)
     if response:
         return create_response(response={}, status=200)
     else:

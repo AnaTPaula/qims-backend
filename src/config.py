@@ -44,10 +44,10 @@ class Localconfig(Config):
         self.debug = True
         self.logging_level = logging.DEBUG
         self.origin = 'http://localhost:4200'
-        self.database_url = 'postgresql+psycopg2://postgres:postgres@localhost:5432/qim'
+        self.database_url = 'postgresql+psycopg2://postgres:123@localhost:5432/qim'
         self.database_host = 'localhost'
         self.database_username = 'postgres'
-        self.database_password = 'postgres'
+        self.database_password = '123'
         self.database_port = '5432'
         self.database_name = 'qim'
 

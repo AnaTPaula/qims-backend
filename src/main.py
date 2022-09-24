@@ -9,7 +9,7 @@ if __name__ == '__main__':
                         datefmt='%d-%b-%y %H:%M:%S',
                         level=config.logging_level)
 
-    config.create_table()
+    # config.create_table()
     admins = find()
     if not admins:
         create(body={

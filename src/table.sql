@@ -1,9 +1,9 @@
 -- USUARIO
 create table usuario(
-    id bigint primary key,
+    id serial primary key,
     tipo character varying(15) not null,
     senha character varying(300) not null,
-    data_cadastro bigint not null default TIMESTAMP(now()),
+    data_cadastro bigint not null default cast(to_char((current_timestamp)::TIMESTAMP,'yyyymmddhhmiss') as BigInt)
 );
 
 
@@ -13,7 +13,6 @@ create table administrador(
     nome_usuario character varying(50) not null,
     constraint _nome_usuario_administrador_uc unique(nome_usuario)
 );
-
 
 
 -- EMPRESA
@@ -32,7 +31,7 @@ create table empresa(
 create table operador(
     usuario_fk bigint primary key references usuario(id) on update cascade on delete cascade,
     tipo_acesso character varying(20) not null,
-    empresa_fk bigint not null references empresa(id),
+    empresa_fk bigint not null references empresa(usuario_fk),
     nome_usuario character varying(100) not null,
     constraint _nome_usuario_funcionario_uc unique(nome_usuario, empresa_fk)
 );
@@ -40,7 +39,7 @@ create table operador(
 
 -- PRODUTO
 create table produto(
-    id bigint primary key,
+    id serial primary key,
     nome character varying(100) not null,
     preco float not null,
     descricao character varying(200),
@@ -55,13 +54,13 @@ create table produto(
 
 -- ESTOQUE
 create table estoque(
-    id bigint primary key,
+    id serial primary key,
     nome character varying(100) not null,
     quantidade float not null,
     descricao character varying(200),
     localizacao character varying(100) not null,
     produto_fk bigint not null references produto(id) on update cascade,
-    empresa_fk bigint not null references empresa(usuario_fk) on update cascade on delete cascade,
+    empresa_fk bigint not null references empresa(usuario_fk) on update cascade on delete cascade
 );
 
 
@@ -73,18 +72,18 @@ create table historico(
     quantidade float not null,
     empresa_fk bigint not null references empresa(usuario_fk) on update cascade on delete cascade,
     operacao character varying(100) not null,
-    datahora bigint not null default TIMESTAMP(now()),
+    datahora bigint not null default cast(to_char((current_timestamp)::TIMESTAMP,'yyyymmddhhmiss') as BigInt)
 );
 
 
 -- LOTE
 create table lote(
-    id bigint primary key,
+    id serial primary key,
     codigo_lote character varying(100) not null,
     data_entrada bigint not null,
     data_validade bigint not null,
     quantidade float not null,
-    empresa_fk bigint not null references empresa(usuario_fk) on update cascade on delete cascade,
+    empresa_fk bigint not null references empresa(usuario_fk) on update cascade on delete cascade
 );
 
 
@@ -92,5 +91,5 @@ create table lote(
 create table estoque_lote(
     estoque_fk bigint not null references estoque(id) on update cascade,
     lote_fk bigint not null references lote(id) on update cascade,
-    empresa_fk bigint not null references empresa(usuario_fk) on update cascade on delete cascade,
+    empresa_fk bigint not null references empresa(usuario_fk) on update cascade on delete cascade
 );
