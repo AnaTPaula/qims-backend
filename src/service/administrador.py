@@ -1,85 +1,83 @@
 import logging
 
-from config import get_config
-from model.model import Administrador, Usuario
 from controller.api_helper import ApiError
+from model.administrador import AdministradorHelper, query_all_adm, execute_create_adm, execute_update_adm, \
+    query_one_adm
+from model.usuario import UsuarioHelper, execute_create_user, execute_delete_user, execute_update_user
 
 
 def find():
-    session = get_config().get_session()
     try:
-        items = session.query(Administrador).all()
-        return [item.serialize for item in items]
+        items = query_all_adm()
+        return [AdministradorHelper.serialize(item) for item in items]
     except Exception as ex:
         logging.error(ex)
         raise ApiError()
-    finally:
-        session.close()
 
 
 def create(body: dict):
     if not is_unique(body=body):
         raise ApiError(error_code=400, error_message='Nome já existe.')
-    session = get_config().get_session()
+    item = {
+        'tipo': 'administrador',
+        'senha': UsuarioHelper.set_hash_password(body['senha']),
+        'nomeUsuario': body['nomeUsuario']
+    }
     try:
-        usuario = Usuario(tipo='administrador')
-        usuario.set_hash_password(senha=body['senha'])
-        session.add(usuario)
-        session.commit()
+        user_id = execute_create_user(item=item)
     except Exception as ex:
         logging.error(ex)
-        session.rollback()
-        session.close()
         raise ApiError()
 
     try:
-        item = Administrador(
-            usuario_fk=usuario.id,
-            nome_usuario=body['nomeUsuario'])
-        session.add(item)
-        session.commit()
-        return item.serialize
+        item['id'] = user_id
+        execute_create_adm(item=item)
+        return {}
     except Exception as ex:
         logging.error(ex)
-        session.rollback()
-        session.delete(usuario)
-        session.commit()
-
+        delete(usuario_id=user_id)
         raise ApiError()
-    finally:
-        session.close()
 
 
 def update(body: dict):
     if not is_unique(body=body):
         raise ApiError(error_code=400, error_message='Nome já existe.')
-    session = get_config().get_session()
     try:
-        item = session.query(Administrador).filter_by(usuario_fk=body['id']).first()
-        item.nome_usuario = body['nomeUsuario']
-        if body.get('senha'):
-            item.usuario.set_hash_password(senha=body['senha'])
-
-        session.add(item)
-        session.commit()
-        return item.serialize
-    except Exception as ex:
-        logging.error(ex)
-        session.rollback()
-    finally:
-        session.close()
-
-
-def is_unique(body: dict):
-    session = get_config().get_session()
-    try:
-        item = session.query(Administrador).filter_by(nome_usuario=body['nomeUsuario']).first()
-        if body.get('id'):
-            return False if item and int(body.get('id')) != item.usuario_fk else True
+        item = query_one_adm(usuario_id=body['id'])
+        if item:
+            item['nomeUsuario'] = body['nomeUsuario']
+            if body.get('senha'):
+                item['senha'] = body['senha']
+            execute_update_user(item=item)
+            execute_update_adm(item=item)
         else:
-            return False if item else True
+            raise ApiError(error_code=404, error_message='Usuário não encontrado.')
+        return item.serialize
+    except ApiError as err:
+        raise err
     except Exception as ex:
         logging.error(ex)
         raise ApiError()
-    finally:
-        session.close()
+
+
+def delete(usuario_id: int):
+    try:
+        item = query_one_adm(usuario_id=usuario_id)
+        if item:
+            execute_delete_user(usuario_id=usuario_id)
+        return item
+    except Exception as ex:
+        logging.error(ex)
+        raise ApiError()
+
+
+def is_unique(body: dict):
+    try:
+        items = query_all_adm(nome=body['nomeUsuario'])
+        if body.get('id'):
+            return False if items and int(body.get('id')) != items[0].get('id') else True
+        else:
+            return False if items else True
+    except Exception as ex:
+        logging.error(ex)
+        raise ApiError()

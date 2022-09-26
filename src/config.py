@@ -25,8 +25,11 @@ class Config:
         self.database_name = None
 
     def create_table(self):
-        engine = self.__get_engine()
-        Base.metadata.create_all(engine)
+        # engine = self.__get_engine()
+        # Base.metadata.create_all(engine)
+        with open('table.sql') as file:
+            script = file.read()
+        database.execute(script)
 
     def get_session(self):
         engine = self.__get_engine()
@@ -44,10 +47,10 @@ class Localconfig(Config):
         self.debug = True
         self.logging_level = logging.DEBUG
         self.origin = 'http://localhost:4200'
-        self.database_url = 'postgresql+psycopg2://postgres:123@localhost:5432/qim'
+        self.database_url = 'postgresql+psycopg2://postgres:postgres@localhost:5432/qim'
         self.database_host = 'localhost'
         self.database_username = 'postgres'
-        self.database_password = '123'
+        self.database_password = 'postgres'
         self.database_port = '5432'
         self.database_name = 'qim'
 
@@ -105,28 +108,53 @@ class Database:
                 logging.error(e)
                 raise e
 
-    def select_all(self, query):
+    def select_all(self, query: str, params: tuple = None):
         self.get_connection()
         with self.conn.cursor(cursor_factory=DictCursor) as cur:
-            cur.execute(query)
+            if params:
+                cur.execute(query, params)
+            else:
+                cur.execute(query)
             records = [dict(row) for row in cur.fetchall()]
             cur.close()
             return records
 
-    def select_one(self, query):
+    def select_one(self, query: str, params: tuple = None):
         self.get_connection()
         with self.conn.cursor(cursor_factory=DictCursor) as cur:
-            cur.execute(query)
+            if params:
+                cur.execute(query, params)
+            else:
+                cur.execute(query)
             record = cur.fetchone()
             cur.close()
             return dict(record) if record else None
 
-    def execute(self, query):
+    def execute(self, query: str, params: tuple = None):
         try:
             self.get_connection()
             with self.conn.cursor() as cur:
-                cur.execute(query)
+                if params:
+                    cur.execute(query, params)
+                else:
+                    cur.execute(query)
                 self.conn.commit()
+        except Exception as ex:
+            self.conn.rollback()
+            raise ex
+        finally:
+            cur.close()
+
+    def execute_returning_id(self, query: str, params: tuple = None):
+        try:
+            self.get_connection()
+            with self.conn.cursor() as cur:
+                if params:
+                    cur.execute(query, params)
+                else:
+                    cur.execute(query)
+                self.conn.commit()
+                return cur.fetchone()[0]
         except Exception as ex:
             self.conn.rollback()
             raise ex

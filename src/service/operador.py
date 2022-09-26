@@ -3,7 +3,7 @@ import logging
 from config import get_config
 from controller.api_helper import ApiError
 from model.operador import query_all, query_one, execute_create, execute_update, execute_delete, OperadorHelper
-from model.usuario import set_hash_password
+from model.usuario import UsuarioHelper
 
 
 def find(empresa_id: str):
@@ -44,7 +44,7 @@ def update(body: dict):
         item['acesso'] = body['acesso']
         if body.get('senha'):
             item['senha'] = body['senha']
-            set_hash_password(item, body['senha'])
+            UsuarioHelper.set_hash_password(item, body['senha'])
         execute_update(item=OperadorHelper.serialize(item))
         return {}
     except Exception as ex:
