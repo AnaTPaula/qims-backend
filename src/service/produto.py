@@ -14,6 +14,15 @@ def find(empresa_id: str, nome: str):
         raise ApiError()
 
 
+def get_item(empresa_id: str, produto_id: int, nome: str):
+    try:
+        items = query_one_prd(empresa_id=empresa_id, id=produto_id, nome=nome)
+        return [ProdutoHelper.serialize(item) for item in items]
+    except Exception as ex:
+        logging.error(ex)
+        raise ApiError()
+
+
 def create(body: dict):
     if not is_unique(body=body):
         raise ApiError(error_code=400, error_message='Nome já existe.')
@@ -29,17 +38,10 @@ def create(body: dict):
         'pontoReposicao': body['pontoReposicao']
     }
     try:
-        prd = execute_create_prd(item=item)
-    except Exception as ex:
-        logging.error(ex)
-        raise ApiError()
-    try:
-        item['id'] = prd['id']
         execute_create_prd(item=item)
         return {}
     except Exception as ex:
         logging.error(ex)
-        delete(id=prd['id'], empresa_id=prd['empresaId'], nome=prd['nome'])
         raise ApiError()
 
 
@@ -58,8 +60,8 @@ def update(body: dict):
             item['pontoReposicao'] = body['pontoReposicao']
             execute_update_prd(item=item)
         else:
-            raise ApiError(error_code=404, error_message='Usuário não encontrado.')
-        return item.serialize
+            raise ApiError(error_code=404, error_message='Produto não encontrado')
+        return {}
     except ApiError as err:
         raise err
     except Exception as ex:
@@ -67,12 +69,12 @@ def update(body: dict):
         raise ApiError()
 
 
-def delete(empresa_id: str, id: int, nome: str ):
+def remove(empresa_id: str, id: int, nome: str ):
     try:
         item = query_one_prd(empresa_id=empresa_id, id=id, nome=nome)
         if item:
             execute_delete_prd(empresa_id=empresa_id, id=id)
-        return item
+        return {}
     except Exception as ex:
         logging.error(ex)
         raise ApiError()
