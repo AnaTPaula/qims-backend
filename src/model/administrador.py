@@ -13,7 +13,7 @@ class AdministradorHelper:
 
 
 def query_all_adm(nome: str = None):
-    query = f"SELECT a.nome_usuario, u.id, u.tipo, u.data_cadastro from administrador a " \
+    query = f"SELECT a.nome_usuario, u.id, u.tipo, u.senha, u.data_cadastro from administrador a " \
             f"JOIN usuario u ON a.usuario_fk = u.id"
     if nome:
         query += " WHERE nome_usuario = %s"
@@ -23,7 +23,7 @@ def query_all_adm(nome: str = None):
 def query_one_adm(usuario_id: int):
     query = "SELECT a.nome_usuario, u.id, u.tipo, u.senha, u.data_cadastro from administrador a " \
             "JOIN usuario u ON a.usuario_fk = u.id WHERE a.usuario_fk = %s"
-    return database.select_one(query=query, params=(str(usuario_id),))
+    return database.select_one(query=query, params=(usuario_id,))
 
 
 def execute_create_adm(item: dict):

@@ -1,5 +1,7 @@
 import logging
 
+from werkzeug.exceptions import HTTPException
+
 from controller.api_helper import ApiError
 from model.administrador import AdministradorHelper, query_all_adm, execute_create_adm, execute_update_adm, \
     query_one_adm
@@ -10,6 +12,15 @@ def find():
     try:
         items = query_all_adm()
         return [AdministradorHelper.serialize(item) for item in items]
+    except Exception as ex:
+        logging.error(ex)
+        raise ApiError()
+
+
+def get_item(administrador_id: int):
+    try:
+        item = query_one_adm(usuario_id=administrador_id)
+        return AdministradorHelper.serialize(item) if item else {}
     except Exception as ex:
         logging.error(ex)
         raise ApiError()
@@ -35,7 +46,7 @@ def create(body: dict):
         return {}
     except Exception as ex:
         logging.error(ex)
-        delete(usuario_id=user_id)
+        execute_delete_user(usuario_id=user_id)
         raise ApiError()
 
 
@@ -47,20 +58,20 @@ def update(body: dict):
         if item:
             item['nomeUsuario'] = body['nomeUsuario']
             if body.get('senha'):
-                item['senha'] = body['senha']
+                item['senha'] = UsuarioHelper.set_hash_password(body['senha'])
             execute_update_user(item=item)
             execute_update_adm(item=item)
         else:
             raise ApiError(error_code=404, error_message='Usuário não encontrado.')
-        return item.serialize
-    except ApiError as err:
-        raise err
+        return {}
+    except HTTPException as http_exception:
+        raise http_exception
     except Exception as ex:
         logging.error(ex)
         raise ApiError()
 
 
-def delete(usuario_id: int):
+def remove(usuario_id: int):
     try:
         item = query_one_adm(usuario_id=usuario_id)
         if item:

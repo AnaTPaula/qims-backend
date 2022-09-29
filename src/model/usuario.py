@@ -40,10 +40,15 @@ def execute_create_user(item: dict) -> int:
 
 
 def execute_update_user(item: dict):
-    query = "UPDATE usuario SET tipo = %s, senha = %s WHERE id = %s;"
-    database.execute(query=query, params=(item['tipo'], item['senha'], item['id'],))
+    query = "UPDATE usuario SET senha = %s WHERE id = %s;"
+    database.execute(query=query, params=(item['senha'], item['id'],))
 
 
 def execute_delete_user(usuario_id: int):
-    query = f"DELETE FROM usuario WHERE id = %s;"
+    query = "DELETE FROM usuario WHERE id = %s;"
     database.execute(query=query, params=(usuario_id,))
+
+
+def execute_delete_batch_user(usuario_ids: tuple):
+    query = "DELETE FROM usuario WHERE id in %s;"
+    database.execute(query=query, params=(usuario_ids,))

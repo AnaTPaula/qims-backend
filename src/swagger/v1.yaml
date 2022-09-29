@@ -170,7 +170,7 @@ paths:
         "404":
           description: "Não encontrado"
 
-  /empresa/{empresa_id/produto}:
+  /empresa/{empresa_id}/produto:
     options:
       x-swagger-router-controller: controller.produto
       operationId: options
@@ -188,29 +188,29 @@ paths:
           description: Default response for CORS method
     get:
       x-swagger-router-controller: controller.produto
-        operationId: search
-        produces:
-          - "application/json"
-        parameters:
-          - in: "path"
-            name: "empresa_id"
-            required: true
-            type: "string"
-          - in: "query"
-            name: "nome"
-            required: false
-            type: "string"
-        responses:
-          "200":
-            description: "Ok"
-            schema:
-              type: "array"
-              items:
-                $ref: "#/definitions/produto"
-          "401":
-            description: "Não autorizado"
-          "404":
-            description: "Não encontrado"
+      operationId: search
+      produces:
+        - "application/json"
+      parameters:
+        - in: "path"
+          name: "empresa_id"
+          required: true
+          type: "string"
+        - in: "query"
+          name: "nome"
+          required: false
+          type: "string"
+      responses:
+        "200":
+          description: "Ok"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/produto"
+        "401":
+          description: "Não autorizado"
+        "404":
+          description: "Não encontrado"
     post:
       x-swagger-router-controller: controller.produto
       operationId: post
@@ -679,15 +679,15 @@ paths:
         "404":
           description: "Não encontrado"
 
-  /empresa/{empresa_id}/info:
+  /admin/{administrador_id}:
     options:
-      x-swagger-router-controller: controller.empresa
-      operationId: options_id_info
+      x-swagger-router-controller: controller.administrador
+      operationId: options_id
       produces:
         - "application/json"
       parameters:
         - in: "path"
-          name: "empresa_id"
+          name: "administrador_id"
           required: true
           type: "string"
       summary: CORS suporte
@@ -696,37 +696,46 @@ paths:
         200:
           description: Metodo generico para CORS
     get:
-      x-swagger-router-controller: controller.empresa
-      operationId: get_info
+      x-swagger-router-controller: controller.administrador
+      operationId: get
       produces:
         - "application/json"
       parameters:
         - in: "path"
-          name: "empresa_id"
+          name: "administrador_id"
           required: true
           type: "string"
       responses:
         "200":
           description: "OK"
           schema:
-            $ref: "#/definitions/empresa"
+            $ref: "#/definitions/administrador"
         "401":
           description: "Não autorizado"
         "404":
           description: "Não encontrado"
-    delete:
-      x-swagger-router-controller: controller.empresa
-      operationId: delete_info
+    put:
+      x-swagger-router-controller: controller.administrador
+      operationId: put
+      consumes:
+        - "application/json"
       produces:
         - "application/json"
       parameters:
         - in: "path"
-          name: "empresa_id"
+          name: "administrador_id"
           required: true
           type: "string"
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: "#/definitions/administrador"
       responses:
         "200":
           description: "OK"
+          schema:
+            $ref: "#/definitions/empresa"
         "400":
           description: "Dados Inválidos"
         "401":
@@ -800,19 +809,20 @@ definitions:
       nome:
         type: "string"
       preco:
-        type: "float"
+        type: "number"
       descricao:
         type: "string"
       unidade:
         type: "string"
       estoque_minimo:
-        type: "float"
+        type: "number"
       estoque_maximo:
-        type: "float"
+        type: "number"
       ponto_reposicao:
-        type: "float"
+        type: "number"
       empresa_fk:
-        type: "int"
+        type: "integer"
+        format: "int64"
   operador:
     type: "object"
     properties:
@@ -822,6 +832,17 @@ definitions:
       nomeUsuario:
         type: "string"
       acesso:
+        type: "string"
+      senha:
+        type: "string"
+
+  administrador:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      nomeUsuario:
         type: "string"
       senha:
         type: "string"
