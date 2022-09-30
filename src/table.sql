@@ -72,7 +72,7 @@ create table IF NOT EXISTS historico(
     quantidade float not null,
     empresa_fk bigint not null references empresa(usuario_fk) on update cascade on delete cascade,
     operacao character varying(100) not null,
-    datahora bigint not null default cast(to_char((current_timestamp)::TIMESTAMP,'yyyymmddhhmiss') as BigInt)
+    data_hora bigint not null default extract(epoch from now())
 );
 
 
