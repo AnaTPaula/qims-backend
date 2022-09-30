@@ -1,4 +1,6 @@
 from config import database
+from model.usuario import UsuarioHelper
+
 
 class EmpresaHelper:
 
@@ -8,39 +10,42 @@ class EmpresaHelper:
             'nomeUsuario': item.get('nome_usuario'),
             'situacaoConta': item.get('situacao_conta'),
             'tipoArmazenagem': item.get('tipo_armazenagem'),
-            'aceiteTermosUso': item.get('aceite_termos_uso'),
-            'usuarioId': item.get('usuario_fk'),
-            'razaoSocial': item.get('razao_social')
+            'aceiteTermosUso': item.get('aceite_termos_de_uso'),
+            'razaoSocial': item.get('razao_social'),
+            **UsuarioHelper.serialize(item)
         }
 
 
-def query_all(usuario_id: str, nome: str = None):
-    query = f"SELECT * from empresa WHERE usuario_fk = {usuario_id}"
+def query_all_empresa(nome: str = None):
+    query = "SELECT e.nome_usuario, e.situacao_conta, e.tipo_armazenagem, e.aceite_termos_de_uso, e.razao_social," \
+            " u.id, u.tipo, u.senha, u.data_cadastro from empresa e JOIN usuario u ON e.usuario_fk = u.id"
     if nome:
-        query += f" AND nome_usuario = '{nome}'"
-    return database.select_all(query=query)
+        query += " WHERE nome_usuario = %s;"
+    return database.select_all(query=query, params=(nome,))
 
 
-def query_one(usuario_fk: str):
-    query = f"SELECT * from empresa WHERE usuario_fk = {usuario_fk}"
-    return database.select_one(query=query)
+def query_one_empresa(usuario_id: int):
+    query = "SELECT e.nome_usuario, e.situacao_conta, e.tipo_armazenagem, e.aceite_termos_de_uso, e.razao_social," \
+            " u.id, u.tipo, u.data_cadastro from empresa e JOIN usuario u ON e.usuario_fk = u.id " \
+            "WHERE e.usuario_fk = %s"
+    return database.select_one(query=query, params=(usuario_id,))
 
 
-def execute_create(item: dict):
-    query = f" INSERT INTO empresa (nome_usuario, situacao_conta, tipo_armazenagem," \
-            f" aceite_termos_uso, usuario_fk, razao_social)VALUES " \
-            f" ('{item['nomeUsuario']}', '{item['situacaoConta']}', '{item['tipoArmazenagem']}', " \
-            f" ('{item['aceiteTermosUso']}', '{item['usuarioId']}', '{item['razaoSocial']}'); "
-    database.execute(query=query)
+def execute_create_empresa(item: dict):
+    query = "INSERT INTO empresa (nome_usuario, situacao_conta, tipo_armazenagem, aceite_termos_de_uso, " \
+            "usuario_fk, razao_social) VALUES (%s, %s, %s, %s, %s, %s); "
+    database.execute(query=query, params=(
+        item['nomeUsuario'], item['situacaoConta'], item['tipoArmazenagem'], item['aceiteTermosUso'], item['id'],
+        item['razaoSocial'],))
 
 
-def execute_update(item: dict):
-    query = f" UPDATE empresa SET nome_usuario = '{item['nomeUsuario']}', situacao_conta = '{item['situacaoConta']}', " \
-            f" tipo_armazenagem = '{item['tipoArmazenagem']}' " \
-            f" WHERE usuario_fk = '{item['usuarioId']}' "
-    database.execute(query=query)
+def execute_update_empresa(item: dict):
+    query = "UPDATE empresa SET nome_usuario = %s, situacao_conta = %s, aceite_termos_de_uso = %s, " \
+            " razao_social = %s  WHERE usuario_fk = %s "
+    database.execute(query=query, params=(
+        item['nomeUsuario'], item['situacaoConta'], item['aceiteTermosUso'], item['razaoSocial'], item['id']))
 
 
-def execute_delete(usuario_fk: str):
-    query = f"DELETE FROM empresa WHERE usuario_fk = '{usuario_fk}'"
-    database.execute(query=query)
+def execute_delete_empresa(usuario_id: int):
+    query = "DELETE FROM empresa WHERE usuario_fk = %s"
+    database.execute(query=query, params=(usuario_id,))

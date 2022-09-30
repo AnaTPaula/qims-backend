@@ -1,4 +1,6 @@
 from config import database
+from model.usuario import UsuarioHelper
+
 
 class AdministradorHelper:
 
@@ -6,32 +8,34 @@ class AdministradorHelper:
     def serialize(item):
         return {
             'nomeUsuario': item.get('nome_usuario'),
-            'usuario_id': item.get('usuario_fk'),
+            **UsuarioHelper.serialize(item)
         }
 
 
-def query_all():
-    query = f"SELECT * from administrador"
-    return database.select_all(query=query)
+def query_all_adm(nome: str = None):
+    query = f"SELECT a.nome_usuario, u.id, u.tipo, u.senha, u.data_cadastro from administrador a " \
+            f"JOIN usuario u ON a.usuario_fk = u.id"
+    if nome:
+        query += " WHERE nome_usuario = %s"
+    return database.select_all(query=query, params=(nome,))
 
 
-def query_one(usuario_id: str):
-    query = f"SELECT * from administrador WHERE usuario_fk = {usuario_id}"
-    return database.select_one(query=query)
+def query_one_adm(usuario_id: int):
+    query = "SELECT a.nome_usuario, u.id, u.tipo, u.senha, u.data_cadastro from administrador a " \
+            "JOIN usuario u ON a.usuario_fk = u.id WHERE a.usuario_fk = %s"
+    return database.select_one(query=query, params=(usuario_id,))
 
 
-def execute_create(item: dict):
-    query = f" INSERT INTO (nome_usuario, usuario_fk VALUES" \
-            f" ('{item['nomeUsuario']}', '{item['usuarioFk']}'"
-    database.execute(query=query)
+def execute_create_adm(item: dict):
+    query = "INSERT INTO administrador (nome_usuario, usuario_fk) VALUES (%s, %s);"
+    database.execute(query=query, params=(item['nomeUsuario'], item['id'],))
 
 
-def execute_update(item: dict):
-    query = f" UPDATE administrador SET nome_usuario = '{item['nomeUsuario']}',"\
-            f" WHERE usuario_fk = '{item['usuarioID']}'"
-    database.execute(query=query)
+def execute_update_adm(item: dict):
+    query = "UPDATE administrador SET nome_usuario = %s WHERE usuario_fk = %s;"
+    database.execute(query=query, params=(item['nomeUsuario'], item['id'],))
 
 
-def execute_delete(usuario_fk: str):
-    query = f"DELETE FROM administrador WHERE usuario_fk = '{usuario_fk}'"
-    database.execute(query=query)
+def execute_delete_adm(usuario_fk: int):
+    query = "DELETE FROM administrador WHERE usuario_fk = %s"
+    database.execute(query=query, params=(usuario_fk,))

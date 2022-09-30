@@ -1,4 +1,6 @@
+from passlib.handlers.pbkdf2 import pbkdf2_sha256
 from config import database
+
 
 class UsuarioHelper:
 
@@ -7,33 +9,46 @@ class UsuarioHelper:
         return {
             'id': item.get('id'),
             'tipo': item.get('tipo'),
-            'senha': item.get('senha'),
             'dataCadastro': item.get('data_cadastro')
         }
 
+    @staticmethod
+    def verify_password(item: dict, senha_sem_hash: str):
+        try:
+            return pbkdf2_sha256.verify(senha_sem_hash, item['senha'])
+        except ValueError:
+            return False
 
-def query_all():
-    query = f" SELECT * from usuario "
-    return database.select_all(query=query)
-
-
-def query_one(usuario_id: str):
-    query = f" SELECT * from usuario WHERE id = {usuario_id} "
-    return database.select_one(query=query)
-
-
-def execute_create(item: dict):
-    query = f" INSERT INTO usuario (tipo, senha, data_cadastro) VALUES " \
-            f" ('{item['tipo']}', '{item['senha']}', '{item['dataCadastro']}'); "
-    database.execute(query=query)
+    @staticmethod
+    def set_hash_password(senha_nova: str):
+        return pbkdf2_sha256.hash(senha_nova)
 
 
-def execute_update(item: dict):
-    query = f" UPDATE usuario SET tipo = '{item['tipo']}', senha = '{item['senha']}' " \
-            f" WHERE id = '{item['id']}'"
-    database.execute(query=query)
+# def query_all():
+#     query = f" SELECT * from usuario "
+#     return database.select_all(query=query)
+#
+#
+# def query_one(usuario_id: str):
+#     query = f" SELECT * from usuario WHERE id = {usuario_id} "
+#     return database.select_one(query=query)
 
 
-def execute_delete(usuario_id):
-    query = f" DELETE FROM usuario WHERE id = '{usuario_id}' "
-    database.execute(query=query)
+def execute_create_user(item: dict) -> int:
+    query = "INSERT INTO usuario (tipo, senha) VALUES (%s, %s) RETURNING id;"
+    return database.execute_returning_id(query=query, params=(item['tipo'], item['senha'],))
+
+
+def execute_update_user(item: dict):
+    query = "UPDATE usuario SET senha = %s WHERE id = %s;"
+    database.execute(query=query, params=(item['senha'], item['id'],))
+
+
+def execute_delete_user(usuario_id: int):
+    query = "DELETE FROM usuario WHERE id = %s;"
+    database.execute(query=query, params=(usuario_id,))
+
+
+def execute_delete_batch_user(usuario_ids: tuple):
+    query = "DELETE FROM usuario WHERE id in %s;"
+    database.execute(query=query, params=(usuario_ids,))

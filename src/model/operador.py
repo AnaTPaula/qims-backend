@@ -1,4 +1,6 @@
 from config import database
+from model.usuario import UsuarioHelper
+
 
 class OperadorHelper:
 
@@ -6,34 +8,38 @@ class OperadorHelper:
     def serialize(item):
         return {
             'nomeUsuario': item.get('nome_usuario'),
-            'acesso': item.get('acesso'),
+            'tipoAcesso': item.get('tipo_acesso'),
             'empresaId': item.get('empresa_fk'),
-            'usuarioId': item.get('usuario_fk')
+            **UsuarioHelper.serialize(item)
         }
 
 
-def query_all(empresa_id: str):
-    query = f"SELECT * from operador WHERE empresa_fk = {empresa_id}"
-    return database.select_all(query=query)
+def query_all_operador(empresa_id: int, nome: str = None):
+    query = "SELECT o.nome_usuario, o.tipo_acesso, o.empresa_fk, u.id, u.tipo, u.senha, u.data_cadastro " \
+            "from operador o JOIN usuario u ON o.usuario_fk = u.id WHERE empresa_fk = %s"
+    if nome:
+        query += " AND nome_usuario = %s;"
+    params = (empresa_id, nome,) if nome else (empresa_id,)
+    return database.select_all(query=query, params=params)
 
 
-def query_one(empresa_id: str, usuario_id: int):
-    query = f"SELECT * from operador WHERE empresa_fk = {empresa_id} AND usuario_fk = {usuario_id}"
-    return database.select_one(query=query)
+def query_one_operador(empresa_id: int, usuario_id: int):
+    query = "SELECT o.nome_usuario, o.tipo_acesso, o.empresa_fk, u.id, u.tipo, u.senha, u.data_cadastro " \
+            "from operador o JOIN usuario u ON o.usuario_fk = u.id WHERE empresa_fk = %s AND usuario_fk = %s"
+    return database.select_one(query=query, params=(empresa_id, usuario_id,))
 
 
-def execute_create(item: dict):
-    query = f" INSERT INTO operador (nome_usuario, acesso, empresa_fk, usuario_fk)VALUES " \
-            f" ('{item['nomeUsuario']}', '{item['acesso']}', '{item['empresaId']}', '{item['usuarioId']}'"
-    database.execute(query=query)
+def execute_create_operador(item: dict):
+    query = " INSERT INTO operador (nome_usuario, tipo_acesso, empresa_fk, usuario_fk) VALUES " \
+            " (%s, %s, %s, %s);"
+    database.execute(query=query, params=(item['nomeUsuario'], item['tipoAcesso'], item['empresaId'], item['id'],))
 
 
-def execute_update(item: dict):
-    query = f" UPDATE operador SET nome_usuario = '{item['nomeUsuario']}', acesso = '{item['acesso']}', " \
-            f" WHERE usuario_fk = '{item['usuarioID']}' AND empresa_fk = {item['empresaId']} "
-    database.execute(query=query)
+def execute_update_operador(item: dict):
+    query = " UPDATE operador SET nome_usuario = %s, tipo_acesso = %s WHERE usuario_fk = %s AND empresa_fk = %s;"
+    database.execute(query=query, params=(item['nomeUsuario'], item['tipoAcesso'], item['id'], item['empresaId']))
 
 
-def execute_delete(usuario_fk: str, empresa_fk: str):
-    query = f"DELETE FROM operador WHERE usuario_fk = '{usuario_fk}' AND empresa_fk = {empresa_fk}"
-    database.execute(query=query)
+def execute_delete_operador(usuario_id: int, empresa_id: int):
+    query = f"DELETE FROM operador WHERE usuario_fk = %s AND empresa_fk = %s"
+    database.execute(query=query, params=(usuario_id, empresa_id))

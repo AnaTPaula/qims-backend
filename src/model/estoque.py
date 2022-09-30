@@ -10,36 +10,36 @@ class EstoqueHelper:
             'nome': item.get('nome'),
             'quantidade': item.get('quantidade'),
             'descricao': item.get('descricao'),
-            'localizacao': item.get('localizacao_fk'),
+            'localizacao': item.get('localizacao'),
             'produtoId': item.get('produto_fk'),
             'empresaId': item.get('empresa_fk')
         }
 
 
-def query_all(empresa_id: str):
-    query = f" SELECT * from almoxarifado WHERE empresa_fk = {empresa_id} "
-    return database.select_all(query=query)
+def query_all_estoque(empresa_id: int):
+    query = " SELECT * from estoque WHERE empresa_fk = %s;"
+    return database.select_all(query=query, params=(empresa_id,))
 
 
-def query_one(empresa_id: str, id: int):
-    query = f" SELECT * from estoque WHERE empresa_fk = {empresa_id} AND id = {id} "
-    return database.select_one(query=query)
+def query_one_estoque(empresa_id: int, estoque_id: int):
+    query = "SELECT * from estoque WHERE empresa_fk = %s AND id = %s;"
+    return database.select_one(query=query, params=(empresa_id, estoque_id,))
 
 
-def execute_create(item: dict):
-    query = f" INSERT INTO estoque (id, nome, quantidade, descricao, localizacao, produto_fk, empresa_fk) VALUES " \
-            f" ('{item['id']}', '{item['nome']}', '{item['quantidade']}', '{item['descricao']}', '{item['localizacao']}') "\
-            f" '{item['produtoId']}', '{item['empresaId']}'); "
-    database.execute(query=query)
+def execute_create_estoque(item: dict):
+    query = "INSERT INTO estoque (nome, quantidade, descricao, localizacao, produto_fk, empresa_fk) VALUES " \
+            "(%s, %s, %s, %s, %s, %s);"
+    database.execute(query=query, params=(item['nome'], item['quantidade'], item.get('descricao'), item['localizacao'],
+                                          item['produtoId'], item['empresaId'],))
 
 
-def execute_update(item: dict):
-    query = f" UPDATE estoque SET nome = '{item['nome']}', quantidade = '{item['quantidade']}', " \
-            f" localizacao = '{item['localizacao']}' " \
-            f" WHERE produto_fk = '{item['produtoId']}' AND id = {item['id']} AND empresa_fk = {item['empresaId']} "
-    database.execute(query=query)
+def execute_update_estoque(item: dict):
+    query = "UPDATE estoque SET nome = %s, quantidade = %s, descricao = %s, localizacao = %s " \
+            "WHERE id = %s AND empresa_fk = %s;"
+    database.execute(query=query, params=(item['nome'], item['quantidade'], item.get('descricao'), item['localizacao'],
+                                          item['id'], item['empresaId'],))
 
 
-def execute_delete(id: str, empresa_id: str, produto_id: str):
-    query = f"DELETE FROM estoque WHERE id = {id} AND empresa_fk = {empresa_id} AND produto_fk = {produto_id}"
-    database.execute(query=query)
+def execute_delete_estoque(estoque_id: int, empresa_id: int):
+    query = "DELETE FROM estoque WHERE id = %s AND empresa_fk = %s;"
+    database.execute(query=query, params=(estoque_id, empresa_id,))

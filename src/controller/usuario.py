@@ -33,9 +33,9 @@ def options():
 def validate_request(body: dict):
     if not body.get('tipo') or not body.get('senha') or not body.get('nomeUsuario'):
         ApiError(error_code=400, error_message='Campos invalidos.')
-    if body['tipo'] not in ['administrador', 'empresa', 'funcionario']:
+    if body['tipo'] not in ['administrador', 'empresa', 'operador']:
         ApiError(error_code=400, error_message='Tipo invalido.')
-    if body['tipo'] == 'funcionario' and not body.get('nomeEmpresa'):
+    if body['tipo'] == 'operador' and not body.get('nomeEmpresa'):
         ApiError(error_code=400, error_message='Nome da empresa invalida.')
     if len(body['senha']) > 50:
         ApiError(error_code=400, error_message='Senha ou nome de usuário invalida.')

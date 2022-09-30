@@ -1,23 +1,22 @@
 -- USUARIO
-create table usuario(
-    id bigint primary key,
+create table IF NOT EXISTS usuario(
+    id serial primary key,
     tipo character varying(15) not null,
     senha character varying(300) not null,
-    data_cadastro bigint not null default TIMESTAMP(now()),
+    data_cadastro bigint not null default extract(epoch from now())
 );
 
 
 -- ADMINISTRADOR
-create table administrador(
+create table IF NOT EXISTS administrador(
     usuario_fk bigint primary key references usuario(id) on update cascade on delete cascade,
     nome_usuario character varying(50) not null,
     constraint _nome_usuario_administrador_uc unique(nome_usuario)
 );
 
 
-
 -- EMPRESA
-create table empresa(
+create table IF NOT EXISTS empresa(
     usuario_fk bigint primary key references usuario(id) on update cascade on delete cascade,
     situacao_conta character varying(100) not null,
     tipo_armazenagem character varying(100) not null,
@@ -29,18 +28,18 @@ create table empresa(
 
 
 -- OPERADOR
-create table operador(
+create table IF NOT EXISTS operador(
     usuario_fk bigint primary key references usuario(id) on update cascade on delete cascade,
     tipo_acesso character varying(20) not null,
-    empresa_fk bigint not null references empresa(id),
+    empresa_fk bigint not null references empresa(usuario_fk),
     nome_usuario character varying(100) not null,
     constraint _nome_usuario_funcionario_uc unique(nome_usuario, empresa_fk)
 );
 
 
 -- PRODUTO
-create table produto(
-    id bigint primary key,
+create table IF NOT EXISTS produto(
+    id serial primary key,
     nome character varying(100) not null,
     preco float not null,
     descricao character varying(200),
@@ -54,43 +53,43 @@ create table produto(
 
 
 -- ESTOQUE
-create table estoque(
-    id bigint primary key,
+create table IF NOT EXISTS estoque(
+    id serial primary key,
     nome character varying(100) not null,
     quantidade float not null,
     descricao character varying(200),
     localizacao character varying(100) not null,
     produto_fk bigint not null references produto(id) on update cascade,
-    empresa_fk bigint not null references empresa(usuario_fk) on update cascade on delete cascade,
+    empresa_fk bigint not null references empresa(usuario_fk) on update cascade on delete cascade
 );
 
 
 -- HISTORICO
-create table historico(
+create table IF NOT EXISTS historico(
     operador_fk bigint not null references operador(usuario_fk) on update cascade,
     produto_fk bigint not null references produto(id) on update cascade,
     estoque_fk bigint not null references estoque(id) on update cascade,
     quantidade float not null,
     empresa_fk bigint not null references empresa(usuario_fk) on update cascade on delete cascade,
     operacao character varying(100) not null,
-    datahora bigint not null default TIMESTAMP(now()),
+    datahora bigint not null default cast(to_char((current_timestamp)::TIMESTAMP,'yyyymmddhhmiss') as BigInt)
 );
 
 
 -- LOTE
-create table lote(
-    id bigint primary key,
+create table IF NOT EXISTS lote(
+    id serial primary key,
     codigo_lote character varying(100) not null,
     data_entrada bigint not null,
     data_validade bigint not null,
     quantidade float not null,
-    empresa_fk bigint not null references empresa(usuario_fk) on update cascade on delete cascade,
+    empresa_fk bigint not null references empresa(usuario_fk) on update cascade on delete cascade
 );
 
 
 -- ESTOQUE LOTE
-create table estoque_lote(
+create table IF NOT EXISTS estoque_lote(
     estoque_fk bigint not null references estoque(id) on update cascade,
     lote_fk bigint not null references lote(id) on update cascade,
-    empresa_fk bigint not null references empresa(usuario_fk) on update cascade on delete cascade,
+    empresa_fk bigint not null references empresa(usuario_fk) on update cascade on delete cascade
 );

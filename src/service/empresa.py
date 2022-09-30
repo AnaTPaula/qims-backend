@@ -1,127 +1,122 @@
 import logging
 
-from config import get_config
-from model.model import Empresa, Usuario, Funcionario
+from werkzeug.exceptions import HTTPException
+
 from controller.api_helper import ApiError
+from model.empresa import EmpresaHelper, query_all_empresa, query_one_empresa, execute_create_empresa, \
+    execute_update_empresa
+from model.operador import query_all_operador
+from model.usuario import UsuarioHelper, execute_create_user, execute_update_user, execute_delete_user, \
+    execute_delete_batch_user
 
 
 def find(nome: str):
-    session = get_config().get_session()
     try:
-        if nome:
-            items = session.query(Empresa).filter_by(nome_usuario=nome).all()
-        else:
-            items = session.query(Empresa).filter_by().all()
-        return [item.serialize for item in items]
+        items = query_all_empresa(nome=nome)
+        return [EmpresaHelper.serialize(item) for item in items]
     except Exception as ex:
         logging.error(ex)
         raise ApiError()
-    finally:
-        session.close()
 
 
 def get_item(empresa_id: int):
-    session = get_config().get_session()
     try:
-        item = session.query(Empresa).filter_by(usuario_fk=empresa_id).first()
-        return item.serialize if item else {}
+        item = query_one_empresa(usuario_id=empresa_id)
+        return EmpresaHelper.serialize(item) if item else {}
     except Exception as ex:
         logging.error(ex)
         raise ApiError()
-    finally:
-        session.close()
 
 
 def create(body: dict):
     if not is_unique(body=body):
         raise ApiError(error_code=400, error_message='Nome já existe.')
-    session = get_config().get_session()
+    item = {
+        'tipo': 'empresa',
+        'senha': UsuarioHelper.set_hash_password(body['senha']),
+        'nomeUsuario': body['nomeUsuario'],
+        'situacaoConta': 'EM_ANALISE',
+        'tipoArmazenagem': body['tipoArmazenagem'],
+        'aceiteTermosUso': body['aceiteTermosUso'],
+        'razaoSocial': body['razaoSocial']
+    }
     try:
-        usuario = Usuario(tipo='empresa')
-        usuario.set_hash_password(senha=body['senha'])
-        session.add(usuario)
-        session.commit()
+        user_id = execute_create_user(item=item)
     except Exception as ex:
         logging.error(ex)
-        session.rollback()
-        session.close()
         raise ApiError()
 
     try:
-        item = Empresa(
-            usuario_fk=usuario.id,
-            nome_usuario=body['nomeUsuario'],
-            situacao_conta='EM_ANALISE',
-            lingua=body['lingua'],
-            tipo_armazenagem=body['tipoArmazenagem'],
-            aceite_termos_uso=body['aceiteTermosUso'])
-        session.add(item)
-        session.commit()
-        return item.serialize
+        item['id'] = user_id
+        execute_create_empresa(item=item)
+        return {}
     except Exception as ex:
         logging.error(ex)
-        session.rollback()
-        session.delete(usuario)
-        session.commit()
-
+        execute_delete_user(usuario_id=user_id)
         raise ApiError()
-    finally:
-        session.close()
 
 
 def update(body: dict):
     if not is_unique(body=body):
         raise ApiError(error_code=400, error_message='Nome já existe.')
-    session = get_config().get_session()
     try:
-        item = session.query(Empresa).filter_by(usuario_fk=body['id']).first()
-        item.nome_usuario = body['nomeUsuario']
-        item.lingua = body['lingua']
-        if body.get('situacaoConta'):
-            item.situacao_conta = body['situacaoConta']
-        if body.get('senha'):
-            item.usuario.set_hash_password(senha=body['senha'])
-
-        session.add(item)
-        session.commit()
-        return item.serialize
-    except Exception as ex:
-        logging.error(ex)
-        session.rollback()
-    finally:
-        session.close()
-
-
-def remove(empresa_id: int):
-    session = get_config().get_session()
-    try:
-        item = session.query(Usuario).filter_by(id=empresa_id).first()
+        item = EmpresaHelper.serialize(query_one_empresa(usuario_id=body['id']))
         if item:
-            funcionarios = session.query(Funcionario).filter_by(empresa_fk=item.id)
-            for funcionario in funcionarios:
-                funcionario = session.query(Usuario).filter_by(id=funcionario.usuario_fk).first()
-                session.delete(funcionario)
-            session.commit()
-            session.delete(item)
-            session.commit()
-        return item
-    except Exception as ex:
-        logging.error(ex)
-        session.rollback()
-    finally:
-        session.close()
-
-
-def is_unique(body: dict):
-    session = get_config().get_session()
-    try:
-        item = session.query(Empresa).filter_by(nome_usuario=body['nomeUsuario']).first()
-        if body.get('id'):
-            return False if item and int(body.get('id')) != item.usuario_fk else True
+            item['nomeUsuario'] = body['nomeUsuario']
+            item['razaoSocial'] = body['razaoSocial']
+            if body.get('senha'):
+                item['senha'] = UsuarioHelper.set_hash_password(body['senha'])
+                execute_update_user(item=item)
+            execute_update_empresa(item=item)
         else:
-            return False if item else True
+            raise ApiError(error_code=404, error_message='Usuário não encontrado.')
+        return {}
+    except HTTPException as http_exception:
+        raise http_exception
     except Exception as ex:
         logging.error(ex)
         raise ApiError()
-    finally:
-        session.close()
+
+
+def update_situacao(body: dict):
+    try:
+        item = query_one_empresa(usuario_id=body['id'])
+        item = EmpresaHelper.serialize(item) if item else None
+        if item:
+            item['situacaoConta'] = body['situacaoConta']
+            execute_update_empresa(item=item)
+        else:
+            raise ApiError(error_code=404, error_message='Usuário não encontrado.')
+        return {}
+    except HTTPException as http_exception:
+        raise http_exception
+    except Exception as ex:
+        logging.error(ex)
+        raise ApiError()
+
+
+def remove(empresa_id: int):
+    try:
+        item = query_one_empresa(usuario_id=empresa_id)
+        if item:
+            operadores = query_all_operador(empresa_id=empresa_id)
+            operador_ids = [operador.get('id') for operador in operadores]
+            if operador_ids:
+                execute_delete_batch_user(usuario_ids=tuple(operador_ids))
+            execute_delete_user(usuario_id=empresa_id)
+        return item
+    except Exception as ex:
+        logging.error(ex)
+        raise ApiError()
+
+
+def is_unique(body: dict):
+    try:
+        items = query_all_empresa(nome=body['nomeUsuario'])
+        if body.get('id'):
+            return False if items and int(body.get('id')) != items[0].get('id') else True
+        else:
+            return False if items else True
+    except Exception as ex:
+        logging.error(ex)
+        raise ApiError()
