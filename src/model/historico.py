@@ -6,41 +6,26 @@ class HistoricoHelper:
     @staticmethod
     def serialize(item):
         return {
-            'operadorId': item.get('operador_fk'),
-            'produtoId': item.get('material_fk'),
-            'estoqueId': item.get('estoque_fk'),
+            'operador': item.get('operador'),
+            'produto': item.get('produto'),
+            'estoque': item.get('estoque'),
             'quantidade': item.get('quantidade'),
             'empresaId': item.get('empresa_fk'),
             'operacao': item.get('operacao'),
-            'dataHora': item.get('data_hora'),
+            'dataHora': item.get('datahora'),
         }
 
 
-def query_all(empresa_id: str):
-    query = f"SELECT * from historico WHERE empresa_fk = {empresa_id}"
-    return database.select_all(query=query)
+def query_all_historico(empresa_id: int, produto_id: int):
+    query = "SELECT o.nome_usuario as operador, p.nome as produto, e.nome as estoque, h.quantidade, h.empresa_fk, " \
+            "h.operacao, h.data_hora from historico h JOIN operador o ON h.operador_fk = o.usuario_fk " \
+            "JOIN produto p ON h.produto_fk = p.id JOIN estoque e ON h.estoque_fk = e.id " \
+            "WHERE empresa_fk = %s AND produto_id = %s"
+    return database.select_all(query=query, params=(empresa_id, produto_id,))
 
 
-def query_one(operador_id: str, produto_id: str, estoque_id: str, empresa_id: str):
-    query = f"SELECT * from historico WHERE operador_fk = {operador_id} AND produto_fk = {produto_id} AND estoque_fk = {estoque_id} AND empresa_fk = {empresa_id}"
-    return database.select_one(query=query)
-
-
-def execute_create(item: dict):
-    query = f" INSERT INTO historico (quantidade, operacao, data_hora, operador_fk, produto_fk, estoque_fk, empresa_fk) VALUES " \
-            f" ('{item['quantidade']}', '{item['operacao']}', '{item['dataHora']}', '{item['operadorId']}', " \
-            f" '{item['produtoId']}', '{item['estpoqueId']}', '{item['empresaId']}'); "
-    database.execute(query=query)
-
-
-def execute_update(item: dict):
-    query = f" UPDATE historico SET quantidade = '{item['quantidade']}', operacao = '{item['operacao']}', datahora = '{item['dataHora']}' " \
-            f" WHERE operador_fk = {item['operadorId']} AND produto_fk = {item['produtoId']} AND " \
-            f" estoque_fk = {item['estoqueId']} AND empresa_fk = {item['empresaId']}"
-    database.execute(query=query)
-
-
-def execute_delete(operador_id: str, produto_id: str, estoque_id: str, empresa_id: str):
-    query = f" DELETE FROM almoxarifado WHERE operador_fk = {operador_id} AND produto_fk = {produto_id} AND " \
-            f" estoque_fk = {estoque_id} AND empresa_fk = {empresa_id} "
-    database.execute(query=query)
+def execute_create_historico(item: dict):
+    query = "INSERT INTO historico (quantidade, operacao, operador_fk, produto_fk, estoque_fk, empresa_fk) VALUES " \
+            " (%s, %s, %s, %s, %s, %s); "
+    database.execute(query=query, params=(item['quantidade'], item['operacao'], item['operadorId'],
+                                          item['produtoId'], item['estoqueId'], item['empresaId']))
