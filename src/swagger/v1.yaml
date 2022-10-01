@@ -197,7 +197,7 @@ paths:
           required: true
           type: "string"
         - in: "query"
-          name: "nome"
+          name: "produto_id"
           required: false
           type: "string"
       responses:
@@ -328,6 +328,47 @@ paths:
           description: "OK"
         "400":
           description: "Dados Inválidos"
+        "401":
+          description: "Não autorizado"
+        "404":
+          description: "Não encontrado"
+  /empresa/{empresa_id}/produto/{produto_id}/historico:
+    options:
+      x-swagger-router-controller: controller.historico
+      operationId: options_id
+      produces:
+        - "application/json"
+      parameters:
+        - in: "path"
+          name: "empresa_id"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "produto_id"
+          required: true
+          type: "string"
+      summary: CORS suporte
+      description: Habilita o CORS retornando os cabeçalhos corretos
+      responses:
+        200:
+          description: Metodo generico para CORS
+    get:
+      x-swagger-router-controller: controller.historico
+      operationId: search
+      produces:
+        - "application/json"
+      parameters:
+        - in: "path"
+          name: "empresa_id"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "produto_id"
+          required: true
+          type: "string"
+      responses:
+        "200":
+          description: "OK"
         "401":
           description: "Não autorizado"
         "404":

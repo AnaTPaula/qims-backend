@@ -66,13 +66,15 @@ create table IF NOT EXISTS estoque(
 
 -- HISTORICO
 create table IF NOT EXISTS historico(
-    operador_fk bigint not null references operador(usuario_fk) on update cascade,
-    produto_fk bigint not null references produto(id) on update cascade,
-    estoque_fk bigint not null references estoque(id) on update cascade,
+    id serial primary key,
+    registro_operador bigint not null,
+    nome_operador character varying(100) not null,
+    nome_estoque character varying(100) not null,
     quantidade float not null,
-    empresa_fk bigint not null references empresa(usuario_fk) on update cascade on delete cascade,
+    data_hora bigint not null default extract(epoch from now()),
     operacao character varying(100) not null,
-    data_hora bigint not null default extract(epoch from now())
+    produto_fk bigint not null references produto(id) on update cascade,
+    empresa_fk bigint not null references empresa(usuario_fk) on update cascade on delete cascade
 );
 
 
@@ -81,7 +83,7 @@ create table IF NOT EXISTS lote(
     id serial primary key,
     codigo_lote character varying(100) not null,
     data_entrada bigint not null,
-    data_validade bigint not null,
+    data_validade bigint,
     quantidade float not null,
     empresa_fk bigint not null references empresa(usuario_fk) on update cascade on delete cascade
 );

@@ -40,16 +40,21 @@ def handler_exception(func):
 
 
 def token_required(tipos: list = None, acessos: list = None, validate_empresa: bool = None,
-                   validate_situacao: bool = None, validate_operador: bool = None):
+                   validate_situacao: bool = None, validate_operador: bool = None, get_tipo: bool = False,
+                   get_id: bool = False):
     def decorator(func):
         def wrapper(*args, **kwargs):
-            validate_auth_token(jwt_payload=request.headers.get('token'),
-                                tipos=tipos,
-                                acessos=acessos,
-                                validate_empresa=validate_empresa,
-                                validate_situacao=validate_situacao,
-                                validate_operador=validate_operador,
-                                kwargs=kwargs)
+            payload = validate_auth_token(jwt_payload=request.headers.get('token'),
+                                          tipos=tipos,
+                                          acessos=acessos,
+                                          validate_empresa=validate_empresa,
+                                          validate_situacao=validate_situacao,
+                                          validate_operador=validate_operador,
+                                          kwargs=kwargs)
+            if get_tipo:
+                kwargs['tipo'] = payload['tipo']
+            if get_id:
+                kwargs['usuario_id'] = payload['id']
             response = func(*args, **kwargs)
             return response
 

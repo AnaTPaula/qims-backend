@@ -22,7 +22,8 @@ def query_all_prd(empresa_id: str, nome: str):
             " WHERE p.empresa_fk = %s "
     if nome:
         query += " AND nome = %s"
-    return database.select_all(query=query, params=(empresa_id, nome))
+    params = (empresa_id, nome,) if nome else (empresa_id,)
+    return database.select_all(query=query, params=params)
 
 
 def query_one_prd(empresa_id: str, id: int, nome: str):

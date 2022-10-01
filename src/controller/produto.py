@@ -4,6 +4,7 @@ from flask import make_response
 
 from config import get_config
 from controller.api_helper import ApiError, handler_exception, create_response, token_required
+from service.produto import find, get_item, create, update, remove
 
 config = get_config()
 
@@ -12,8 +13,8 @@ config = get_config()
 @token_required(tipos=['operador'], acessos=['total', 'modificar', 'leitura'], validate_empresa=True)
 def search(empresa_id: str, nome: str = None):
     logging.info('Listando Produtos')
-    # response = find(empresa_id=empresa_id, nome=nome)
-    return create_response(response={}, status=200)
+    response = find(empresa_id=empresa_id, nome=nome)
+    return create_response(response=response, status=200)
 
 
 @handler_exception
