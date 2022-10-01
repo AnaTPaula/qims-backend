@@ -14,10 +14,10 @@ def find(empresa_id: str, nome: str):
         raise ApiError()
 
 
-def get_item(empresa_id: str, produto_id: int, nome: str):
+def get_item(empresa_id: int, produto_id: int):
     try:
-        items = query_one_prd(empresa_id=empresa_id, id=produto_id, nome=nome)
-        return [ProdutoHelper.serialize(item) for item in items]
+        item = query_one_prd(empresa_id=empresa_id, produto_id=produto_id)
+        return ProdutoHelper.serialize(item)
     except Exception as ex:
         logging.error(ex)
         raise ApiError()
@@ -27,7 +27,6 @@ def create(body: dict):
     if not is_unique(body=body):
         raise ApiError(error_code=400, error_message='Nome já existe.')
     item = {
-        'id': body['id'],
         'nome': body['nome'],
         'preco': body['preco'],
         'descricao': body['descricao'],
@@ -49,7 +48,7 @@ def update(body: dict):
     if not is_unique(body=body):
         raise ApiError(error_code=400, error_message='Nome já existe.')
     try:
-        item = query_one_prd(empresa_id=body['empresaId'], id=body['id'], nome=body['nome'])
+        item = query_one_prd(empresa_id=body['empresaId'], produto_id=body['id'])
         if item:
             item['nome'] = body['nome']
             item['preco'] = body['preco']
@@ -58,10 +57,12 @@ def update(body: dict):
             item['estoqueMinimo'] = body['estoqueMinimo']
             item['estoqueMaximo'] = body['estoqueMaximo']
             item['pontoReposicao'] = body['pontoReposicao']
+            item['empresaId'] = body['empresaId']
+            item['id'] = body['id']
             execute_update_prd(item=item)
+            return {}
         else:
             raise ApiError(error_code=404, error_message='Produto não encontrado')
-        return {}
     except ApiError as err:
         raise err
     except Exception as ex:
@@ -69,11 +70,11 @@ def update(body: dict):
         raise ApiError()
 
 
-def remove(empresa_id: str, id: int, nome: str ):
+def remove(empresa_id: int, produto_id: int):
     try:
-        item = query_one_prd(empresa_id=empresa_id, id=id, nome=nome)
+        item = query_one_prd(empresa_id=empresa_id, produto_id=produto_id)
         if item:
-            execute_delete_prd(empresa_id=empresa_id, id=id)
+            execute_delete_prd(empresa_id=empresa_id, produto_id=produto_id)
         return {}
     except Exception as ex:
         logging.error(ex)
