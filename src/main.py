@@ -14,7 +14,7 @@ if __name__ == '__main__':
     if not admins:
         create(body={
             'nomeUsuario': 'admin',
-            'senha': '123@123'
+            'senha': '123'
         })
     app = config_application(config=config)
     app.run(port=config.port_host)

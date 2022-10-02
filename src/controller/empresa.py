@@ -10,10 +10,12 @@ config = get_config()
 
 
 @handler_exception
-@token_required(tipos=['administrador'])
-def search(nome: str = None):
+@token_required(tipos=['administrador', 'empresa'], get_tipo=True)
+def search(tipo: str, nome: str = None):
     logging.info('Listando Empresas')
     response = find(nome=nome)
+    if tipo == 'empresa' and response:
+        response = [{'id': response[0].get('id')}]
     return create_response(response=response, status=200)
 
 

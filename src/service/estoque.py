@@ -27,6 +27,7 @@ def get_item(estoque_id: int, empresa_id: int):
 
 def create(body: dict):
     try:
+        body['quantidade'] = 0
         execute_create_estoque(item=body)
         return {}
     except Exception as ex:
