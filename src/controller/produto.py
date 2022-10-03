@@ -65,7 +65,7 @@ def options(empresa_id: str):
     return response
 
 
-def options_id(empresa_id: str, almoxarifado_id: int):
+def options_id(empresa_id: str, produto_id: int):
     response = make_response('{}', 200)
     response.headers['Access-Control-Allow-Origin'] = config.origin
     response.headers['Access-Control-Allow-Methods'] = 'PUT, GET, DELETE, POST, OPTIONS'
@@ -78,3 +78,7 @@ def validate_request(body: dict):
         ApiError(error_code=400, error_message='Nome invalido.')
     if body.get('descricao') and len(body['descricao']) > 255:
         ApiError(error_code=400, error_message='Descrição invalida.')
+    if not body.get('preco') and isinstance(body.get('preco'), float):
+        ApiError(error_code=400, error_message='Preço invalido.')
+    if not body.get('unidade') or len(body['unidade']) > 25:
+        ApiError(error_code=400, error_message='Unidade invalida.')

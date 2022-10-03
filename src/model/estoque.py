@@ -16,14 +16,17 @@ class EstoqueHelper:
         }
 
 
-def query_all_estoque(empresa_id: int):
-    query = " SELECT * from estoque WHERE empresa_fk = %s;"
-    return database.select_all(query=query, params=(empresa_id,))
+def query_all_estoque(empresa_id: int, produto_id: int, nome: str = None):
+    query = " SELECT * from estoque WHERE empresa_fk = %s AND produto_fk = %s"
+    if nome:
+        query += " AND nome = %s;"
+    params = (empresa_id, produto_id, nome,) if nome else (empresa_id, produto_id,)
+    return database.select_all(query=query, params=params)
 
 
-def query_one_estoque(empresa_id: int, estoque_id: int):
-    query = "SELECT * from estoque WHERE empresa_fk = %s AND id = %s;"
-    return database.select_one(query=query, params=(empresa_id, estoque_id,))
+def query_one_estoque(empresa_id: int, produto_id: int, estoque_id: int):
+    query = "SELECT * from estoque WHERE empresa_fk = %s AND produto_fk = %s AND id = %s;"
+    return database.select_one(query=query, params=(empresa_id, produto_id, estoque_id,))
 
 
 def execute_create_estoque(item: dict):
@@ -40,6 +43,6 @@ def execute_update_estoque(item: dict):
                                           item['id'], item['empresaId'],))
 
 
-def execute_delete_estoque(estoque_id: int, empresa_id: int):
-    query = "DELETE FROM estoque WHERE id = %s AND empresa_fk = %s;"
-    database.execute(query=query, params=(estoque_id, empresa_id,))
+def execute_delete_estoque(empresa_id: int, produto_id: int, estoque_id: int):
+    query = "DELETE FROM estoque WHERE empresa_fk = %s AND produto_fk = %s AND id = %s;"
+    database.execute(query=query, params=(empresa_id, produto_id, estoque_id,))

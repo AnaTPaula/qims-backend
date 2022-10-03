@@ -7,7 +7,7 @@ schemes:
   - "https"
   - "http"
 paths:
-  /empresa/{empresa_id}/estoque:
+  /empresa/{empresa_id}/produto/{produto_id}/estoque:
     options:
       x-swagger-router-controller: controller.estoque
       operationId: options
@@ -71,7 +71,7 @@ paths:
         "401":
           description: "Não autorizado"
 
-  /empresa/{empresa_id}/estoque/{estoque_id}:
+  /empresa/{empresa_id}/produto/{produto_id}/estoque/{estoque_id}:
     options:
       x-swagger-router-controller: controller.estoque
       operationId: options_id
@@ -197,7 +197,7 @@ paths:
           required: true
           type: "string"
         - in: "query"
-          name: "produto_id"
+          name: "nome"
           required: false
           type: "string"
       responses:

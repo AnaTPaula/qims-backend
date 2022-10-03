@@ -1,5 +1,6 @@
 from config import database
 
+
 class ProdutoHelper:
 
     @staticmethod
@@ -34,14 +35,16 @@ def execute_create_prd(item: dict):
     query = " INSERT INTO produto (nome, preco, descricao, unidade, empresa_fk, estoque_minimo, " \
             " estoque_maximo, ponto_reposicao) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
     database.execute(query=query, params=(item['nome'], item['preco'], item['descricao'], item['unidade'],
-                                          item['empresaId'], item['estoqueMinimo'], item['estoqueMaximo'], item['pontoReposicao']))
+                                          item['empresaId'], item['estoqueMinimo'], item['estoqueMaximo'],
+                                          item['pontoReposicao']))
 
 
 def execute_update_prd(item: dict):
     query = " UPDATE produto SET nome = %s, preco = %s, descricao = %s, unidade = %s, estoque_minimo = %s, " \
             " estoque_maximo = %s, ponto_reposicao = %s WHERE empresa_fk = %s AND id = %s "
-    database.execute(query=query, params=(item['nome'], item['preco'], item['descricao'], item['unidade'], item['estoqueMinimo'],
-                                          item['estoqueMaximo'], item['pontoReposicao'], item['empresaId'], item['id']))
+    database.execute(query=query,
+                     params=(item['nome'], item['preco'], item['descricao'], item['unidade'], item['estoqueMinimo'],
+                             item['estoqueMaximo'], item['pontoReposicao'], item['empresaId'], item['id']))
 
 
 def execute_delete_prd(empresa_id: int, produto_id: int):

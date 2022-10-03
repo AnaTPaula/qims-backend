@@ -17,7 +17,7 @@ def find(empresa_id: str, nome: str):
 def get_item(empresa_id: int, produto_id: int):
     try:
         item = query_one_prd(empresa_id=empresa_id, produto_id=produto_id)
-        return ProdutoHelper.serialize(item)
+        return ProdutoHelper.serialize(item) if item else {}
     except Exception as ex:
         logging.error(ex)
         raise ApiError()
@@ -32,9 +32,9 @@ def create(body: dict):
         'descricao': body['descricao'],
         'unidade': body['unidade'],
         'empresaId': body['empresaId'],
-        'estoqueMinimo': body['estoqueMinimo'],
-        'estoqueMaximo': body['estoqueMaximo'],
-        'pontoReposicao': body['pontoReposicao']
+        'estoqueMinimo': 0.0,
+        'estoqueMaximo': 0.0,
+        'pontoReposicao': 0.0
     }
     try:
         execute_create_prd(item=item)
@@ -54,9 +54,9 @@ def update(body: dict):
             item['preco'] = body['preco']
             item['descricao'] = body['descricao']
             item['unidade'] = body['unidade']
-            item['estoqueMinimo'] = body['estoqueMinimo']
-            item['estoqueMaximo'] = body['estoqueMaximo']
-            item['pontoReposicao'] = body['pontoReposicao']
+            item['estoqueMinimo'] = item['estoque_minimo']
+            item['estoqueMaximo'] = item['estoque_maximo']
+            item['pontoReposicao'] = item['ponto_reposicao']
             item['empresaId'] = body['empresaId']
             item['id'] = body['id']
             execute_update_prd(item=item)
