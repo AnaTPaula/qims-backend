@@ -332,6 +332,170 @@ paths:
           description: "Não autorizado"
         "404":
           description: "Não encontrado"
+
+  /empresa/{empresa_id}/lote:
+    options:
+      x-swagger-router-controller: controller.lote
+      operationId: options
+      produces:
+        - "application/json"
+      parameters:
+        - in: "path"
+          name: "lote_id"
+          required: true
+          type: "string"
+      summary: CORS support
+      description: Enable CORS by returning correct headers
+      responses:
+        200:
+          description: Default response for CORS method
+    get:
+      x-swagger-router-controller: controller.lote
+      operationId: search
+      produces:
+        - "application/json"
+      parameters:
+        - in: "path"
+          name: "empresa_id"
+          required: true
+          type: "string"
+        - in: "query"
+          name: "nome"
+          required: false
+          type: "string"
+      responses:
+        "200":
+          description: "Ok"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/lote"
+        "401":
+          description: "Não autorizado"
+        "404":
+          description: "Não encontrado"
+    post:
+      x-swagger-router-controller: controller.lote
+      operationId: post
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/definitions/lote'
+      responses:
+        "201":
+          description: "Criado"
+          schema:
+            $ref: '#/definitions/lote'
+        "400":
+          description: "Request Inválida"
+        "401":
+          description: "Não autorizado"
+
+  /empresa/{empresa_id}/lote/{lote_id}:
+    options:
+      x-swagger-router-controller: controller.lote
+      operationId: options_id
+      produces:
+        - "application/json"
+      parameters:
+        - in: "path"
+          name: "empresa_id"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "lote_id"
+          required: true
+          type: "string"
+      summary: CORS suporte
+      description: Habilita o CORS retornando os cabeçalhos corretos
+      responses:
+        200:
+          description: Metodo generico para CORS
+    get:
+      x-swagger-router-controller: controller.lote
+      operationId: get
+      produces:
+        - "application/json"
+      parameters:
+        - in: "path"
+          name: "empresa_id"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "lote_id"
+          required: true
+          type: "string"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/lote"
+        "401":
+          description: "Não autorizado"
+        "404":
+          description: "Não encontrado"
+    put:
+      x-swagger-router-controller: controller.lote
+      operationId: put
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "path"
+          name: "empresa_id"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "lote_id"
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: "#/definitions/lote"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/lote"
+        "400":
+          description: "Dados Inválidos"
+        "401":
+          description: "Não autorizado"
+        "404":
+          description: "Não encontrado"
+    delete:
+      x-swagger-router-controller: controller.lote
+      operationId: delete
+      produces:
+        - "application/json"
+      parameters:
+        - in: "path"
+          name: "empresa_id"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "lote_id"
+          required: true
+          type: "string"
+      responses:
+        "200":
+          description: "OK"
+        "400":
+          description: "Dados Inválidos"
+        "401":
+          description: "Não autorizado"
+        "404":
+          description: "Não encontrado"
+
   /empresa/{empresa_id}/produto/{produto_id}/historico:
     options:
       x-swagger-router-controller: controller.historico
