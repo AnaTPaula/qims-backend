@@ -18,7 +18,7 @@ class ProdutoHelper:
         }
 
 
-def query_all_prd(empresa_id: str, nome: str):
+def query_all_prd(empresa_id: int, nome: str):
     query = " select * from produto where empresa_fk = %s "
     if nome:
         query += " AND nome = %s "
