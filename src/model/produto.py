@@ -19,9 +19,9 @@ class ProdutoHelper:
 
 
 def query_all_prd(empresa_id: str, nome: str):
-    query = "select * from produto where empresa_fk = %s"
+    query = " select * from produto where empresa_fk = %s "
     if nome:
-        query += " AND nome = %s"
+        query += " AND nome = %s "
     params = (empresa_id, nome,) if nome else (empresa_id,)
     return database.select_all(query=query, params=params)
 
