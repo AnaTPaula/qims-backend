@@ -3,6 +3,7 @@ import logging
 from controller.api_helper import ApiError
 from model.produto import ProdutoHelper, query_all_prd, execute_create_prd, execute_update_prd, \
     query_one_prd, execute_delete_prd
+from werkzeug.exceptions import HTTPException
 
 
 def find(empresa_id: str, nome: str):
@@ -17,7 +18,7 @@ def find(empresa_id: str, nome: str):
 def get_item(empresa_id: int, produto_id: int):
     try:
         item = query_one_prd(empresa_id=empresa_id, produto_id=produto_id)
-        return ProdutoHelper.serialize(item)
+        return ProdutoHelper.serialize(item) if item else {}
     except Exception as ex:
         logging.error(ex)
         raise ApiError()
@@ -29,12 +30,12 @@ def create(body: dict):
     item = {
         'nome': body['nome'],
         'preco': body['preco'],
-        'descricao': body['descricao'],
+        'descricao': body.get('descricao'),
         'unidade': body['unidade'],
         'empresaId': body['empresaId'],
-        'estoqueMinimo': body['estoqueMinimo'],
-        'estoqueMaximo': body['estoqueMaximo'],
-        'pontoReposicao': body['pontoReposicao']
+        'estoqueMinimo': 0.0,
+        'estoqueMaximo': 0.0,
+        'pontoReposicao': 0.0
     }
     try:
         execute_create_prd(item=item)
@@ -52,11 +53,11 @@ def update(body: dict):
         if item:
             item['nome'] = body['nome']
             item['preco'] = body['preco']
-            item['descricao'] = body['descricao']
+            item['descricao'] = body.get('descricao')
             item['unidade'] = body['unidade']
-            item['estoqueMinimo'] = body['estoqueMinimo']
-            item['estoqueMaximo'] = body['estoqueMaximo']
-            item['pontoReposicao'] = body['pontoReposicao']
+            item['estoqueMinimo'] = item['estoque_minimo']
+            item['estoqueMaximo'] = item['estoque_maximo']
+            item['pontoReposicao'] = item['ponto_reposicao']
             item['empresaId'] = body['empresaId']
             item['id'] = body['id']
             execute_update_prd(item=item)
@@ -73,9 +74,15 @@ def update(body: dict):
 def remove(empresa_id: int, produto_id: int):
     try:
         item = query_one_prd(empresa_id=empresa_id, produto_id=produto_id)
-        if item:
+        if not item:
+            raise ApiError(error_code=404, error_message='Produto não encontrado')
+        else:
+            if item.get('quantidade') > 0:
+                raise ApiError(error_code=412, error_message='Quantidade de produto é maior que zero')
             execute_delete_prd(empresa_id=empresa_id, produto_id=produto_id)
         return {}
+    except HTTPException as http_exception:
+        raise http_exception
     except Exception as ex:
         logging.error(ex)
         raise ApiError()
