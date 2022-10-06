@@ -5,9 +5,9 @@ from model.lote import LoteHelper, query_all_lote, execute_create_lote, execute_
     execute_delete_lote
 
 
-def find(empresa_id: int):
+def find(empresa_id: int, codigo_lote: str):
     try:
-        items = query_all_lote(empresa_id=empresa_id)
+        items = query_all_lote(empresa_id=empresa_id, codigo_lote=codigo_lote)
         return [LoteHelper.serialize(item) for item in items]
     except Exception as ex:
         logging.error(ex)
@@ -29,7 +29,7 @@ def create(body: dict):
     item = {
         'codigoLote': body['codigoLote'],
         'dataEntrada': body['dataEntrada'],
-        'dataValidade': body['dataValidade'],
+        'dataValidade': body.get('dataValidade'),
         'quantidade': body['quantidade'],
         'empresaId': body['empresaId'],
     }
@@ -45,14 +45,14 @@ def update(body: dict):
     if not is_unique(body=body):
         raise ApiError(error_code=400, error_message='Nome já existe.')
     try:
-        item = query_one_lote(empresa_id=body['empresaId'], lote_id=body['id'])
+        item = LoteHelper.serialize(query_one_lote(empresa_id=body['empresaId'], lote_id=body['id']))
         if item:
             item['codigoLote'] = body['codigoLote']
             item['dataEntrada'] = body['dataEntrada']
-            item['dataValidade'] = body['dataValidade']
+            item['dataValidade'] = body.get('dataValidade')
             item['quantidade'] = body['quantidade']
-            item['empresaId'] = body['empresaId']
-            item['id'] = body['id']
+            # item['empresaId'] = body['empresaId']
+            # item['id'] = body['id']
             execute_update_lote(item=item)
             return {}
         else:
@@ -77,7 +77,7 @@ def remove(empresa_id: int, lote_id: int):
 
 def is_unique(body: dict):
     try:
-        items = query_all_lote(empresa_id=body['empresaId'])
+        items = query_all_lote(empresa_id=body['empresaId'], codigo_lote=body['codigoLote'])
         if body.get('id'):
             return False if items and int(body.get('id')) != items[0].get('id') else True
         else:

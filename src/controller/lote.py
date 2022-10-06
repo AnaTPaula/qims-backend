@@ -11,9 +11,9 @@ config = get_config()
 
 @handler_exception
 @token_required(tipos=['operador'], acessos=['total', 'modificar', 'leitura'], validate_empresa=True)
-def search(empresa_id: int):
+def search(empresa_id: int, codigo_lote: str = None):
     logging.info('Listando Lotes')
-    response = find(empresa_id=empresa_id)
+    response = find(empresa_id=empresa_id, codigo_lote=codigo_lote)
     return create_response(response=response, status=200)
 
 
@@ -52,7 +52,7 @@ def put(empresa_id: int, lote_id: int, body: dict):
 @handler_exception
 @token_required(tipos=['operador'], acessos=['total'], validate_empresa=True)
 def delete(empresa_id: int, lote_id: int):
-    logging.info('Deletando Produto')
+    logging.info('Deletando Lote')
     response = remove(empresa_id=empresa_id, lote_id=lote_id)
     return create_response(response=response, status=200)
 
@@ -74,11 +74,12 @@ def options_id(empresa_id: str, lote_id: int):
 
 
 def validate_request(body: dict):
-    if not body.get('nome') or len(body['nome']) > 50:
-        ApiError(error_code=400, error_message='Nome invalido.')
-    if body.get('descricao') and len(body['descricao']) > 255:
-        ApiError(error_code=400, error_message='Descrição invalida.')
-    if not body.get('preco') and isinstance(body.get('preco'), float):
-        ApiError(error_code=400, error_message='Preço invalido.')
-    if not body.get('unidade') or len(body['unidade']) > 25:
-        ApiError(error_code=400, error_message='Unidade invalida.')
+    if not body.get('dataEntrada') or body.get('dataEntrada') < 0:
+        ApiError(error_code=400, error_message='Data entrada inválidas.')
+    if body.get('dataValidade') and body.get('dataValidade') < 0:
+        ApiError(error_code=400, error_message='Data Validade inválida.')
+    if not body.get('codigoLote') or len(body['codigoLote']) > 50:
+        ApiError(error_code=400, error_message='Código inválido.')
+    if not body.get('quantidade') and body.get('dataValidade') < 0:
+        ApiError(error_code=400, error_message='Quantidade inválida.')
+

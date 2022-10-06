@@ -14,9 +14,13 @@ class LoteHelper:
         }
 
 
-def query_all_lote(empresa_id: int):
+def query_all_lote(empresa_id: int, codigo_lote: str):
     query = f" select * from lote where empresa_fk = %s "
-    params = (empresa_id,)
+    if codigo_lote:
+        query += " and codigo_lote = %s "
+        params = (empresa_id, codigo_lote,)
+    else:
+        params = (empresa_id,)
     return database.select_all(query=query, params=params)
 
 
@@ -29,19 +33,19 @@ def query_one_lote(empresa_id: int, lote_id: int):
 def execute_create_lote(item: dict):
     query = f" INSERT INTO lote (codigo_lote, data_entrada, data_validade, quantidade, empresa_fk) VALUES " \
             f" (%s, %s, %s, %s, %s) "
-    params = (item['codigoLote'], item['dataEntrada'], item['dataValidade'], item['quantidade'], item['EmpresaId'],)
+    params = (item['codigoLote'], item['dataEntrada'], item.get('dataValidade'), item['quantidade'], item['empresaId'],)
     database.execute(query=query, params=params)
 
 
 def execute_update_lote(item: dict):
     query = " UPDATE lote SET codigo_lote = %s, data_entrada = %s, data_validade = %s, quantidade = %s " \
             " WHERE empresa_fk = %s AND id = %s "
-    params = (item['codigoLote'], item['dataEntrada'], item['dataValidade'], item['quantidade'], item['empresaId'],
+    params = (item['codigoLote'], item['dataEntrada'], item.get('dataValidade'), item['quantidade'], item['empresaId'],
               item['id'],)
     database.execute(query=query, params=params)
 
 
 def execute_delete_lote(empresa_id: int, lote_id: int):
-    query = f" DELETE FROM lote WHERE id = %s AND empresa_fk = %s "
+    query = f" DELETE FROM lote WHERE empresa_fk = %s AND id = %s "
     params = (empresa_id, lote_id)
     database.execute(query=query, params=params)

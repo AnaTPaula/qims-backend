@@ -360,7 +360,7 @@ paths:
           required: true
           type: "string"
         - in: "query"
-          name: "nome"
+          name: "codigo_lote"
           required: false
           type: "string"
       responses:
@@ -1024,6 +1024,23 @@ definitions:
       estoque_maximo:
         type: "number"
       ponto_reposicao:
+        type: "number"
+      empresa_fk:
+        type: "integer"
+        format: "int64"
+  lote:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      codigo_lote:
+        type: "string"
+      data_entrada:
+        type: "number"
+      data_validade:
+        type: "number"
+      quantidade:
         type: "number"
       empresa_fk:
         type: "integer"
