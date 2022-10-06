@@ -7,7 +7,7 @@ schemes:
   - "https"
   - "http"
 paths:
-  /empresa/{empresa_id}/produto/{produto_id}/estoque:
+  /empresa/{empresa_id}/estoque:
     options:
       x-swagger-router-controller: controller.estoque
       operationId: options
@@ -71,7 +71,7 @@ paths:
         "401":
           description: "Não autorizado"
 
-  /empresa/{empresa_id}/produto/{produto_id}/estoque/{estoque_id}:
+  /empresa/{empresa_id}/estoque/{estoque_id}:
     options:
       x-swagger-router-controller: controller.estoque
       operationId: options_id
@@ -169,6 +169,42 @@ paths:
           description: "Não autorizado"
         "404":
           description: "Não encontrado"
+  /empresa/{empresa_id}/estoque/alterar:
+    options:
+      x-swagger-router-controller: controller.operacao_estoque
+      operationId: options
+      produces:
+        - "application/json"
+      parameters:
+        - in: "path"
+          name: "empresa_id"
+          required: true
+          type: "string"
+      summary: CORS support
+      description: Enable CORS by returning correct headers
+      responses:
+        200:
+          description: Default response for CORS method
+    post:
+      x-swagger-router-controller: controller.operacao_estoque
+      operationId: change
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/definitions/estoque'
+      responses:
+        "201":
+          description: "Criado"
+        "400":
+          description: "Request Inválida"
+        "401":
+          description: "Não autorizado"
 
   /empresa/{empresa_id}/produto:
     options:
@@ -332,7 +368,47 @@ paths:
           description: "Não autorizado"
         "404":
           description: "Não encontrado"
-
+  /empresa/{empresa_id}/produto/{produto_id}/historico:
+    options:
+      x-swagger-router-controller: controller.historico
+      operationId: options_id
+      produces:
+        - "application/json"
+      parameters:
+        - in: "path"
+          name: "empresa_id"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "produto_id"
+          required: true
+          type: "string"
+      summary: CORS suporte
+      description: Habilita o CORS retornando os cabeçalhos corretos
+      responses:
+        200:
+          description: Metodo generico para CORS
+    get:
+      x-swagger-router-controller: controller.historico
+      operationId: search
+      produces:
+        - "application/json"
+      parameters:
+        - in: "path"
+          name: "empresa_id"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "produto_id"
+          required: true
+          type: "string"
+      responses:
+        "200":
+          description: "OK"
+        "401":
+          description: "Não autorizado"
+        "404":
+          description: "Não encontrado"
   /empresa/{empresa_id}/lote:
     options:
       x-swagger-router-controller: controller.lote
@@ -396,7 +472,6 @@ paths:
           description: "Request Inválida"
         "401":
           description: "Não autorizado"
-
   /empresa/{empresa_id}/lote/{lote_id}:
     options:
       x-swagger-router-controller: controller.lote
@@ -491,48 +566,6 @@ paths:
           description: "OK"
         "400":
           description: "Dados Inválidos"
-        "401":
-          description: "Não autorizado"
-        "404":
-          description: "Não encontrado"
-
-  /empresa/{empresa_id}/produto/{produto_id}/historico:
-    options:
-      x-swagger-router-controller: controller.historico
-      operationId: options_id
-      produces:
-        - "application/json"
-      parameters:
-        - in: "path"
-          name: "empresa_id"
-          required: true
-          type: "string"
-        - in: "path"
-          name: "produto_id"
-          required: true
-          type: "string"
-      summary: CORS suporte
-      description: Habilita o CORS retornando os cabeçalhos corretos
-      responses:
-        200:
-          description: Metodo generico para CORS
-    get:
-      x-swagger-router-controller: controller.historico
-      operationId: search
-      produces:
-        - "application/json"
-      parameters:
-        - in: "path"
-          name: "empresa_id"
-          required: true
-          type: "string"
-        - in: "path"
-          name: "produto_id"
-          required: true
-          type: "string"
-      responses:
-        "200":
-          description: "OK"
         "401":
           description: "Não autorizado"
         "404":

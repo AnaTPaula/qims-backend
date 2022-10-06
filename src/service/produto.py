@@ -3,9 +3,10 @@ import logging
 from controller.api_helper import ApiError
 from model.produto import ProdutoHelper, query_all_prd, execute_create_prd, execute_update_prd, \
     query_one_prd, execute_delete_prd
+from werkzeug.exceptions import HTTPException
 
 
-def find(empresa_id: int, nome: str):
+def find(empresa_id: str, nome: str):
     try:
         items = query_all_prd(empresa_id=empresa_id, nome=nome)
         return [ProdutoHelper.serialize(item) for item in items]
@@ -29,7 +30,7 @@ def create(body: dict):
     item = {
         'nome': body['nome'],
         'preco': body['preco'],
-        'descricao': body['descricao'],
+        'descricao': body.get('descricao'),
         'unidade': body['unidade'],
         'empresaId': body['empresaId'],
         'estoqueMinimo': 0.0,
@@ -52,7 +53,7 @@ def update(body: dict):
         if item:
             item['nome'] = body['nome']
             item['preco'] = body['preco']
-            item['descricao'] = body['descricao']
+            item['descricao'] = body.get('descricao')
             item['unidade'] = body['unidade']
             item['estoqueMinimo'] = item['estoque_minimo']
             item['estoqueMaximo'] = item['estoque_maximo']
@@ -73,9 +74,15 @@ def update(body: dict):
 def remove(empresa_id: int, produto_id: int):
     try:
         item = query_one_prd(empresa_id=empresa_id, produto_id=produto_id)
-        if item:
+        if not item:
+            raise ApiError(error_code=404, error_message='Produto não encontrado')
+        else:
+            if item.get('quantidade') > 0:
+                raise ApiError(error_code=412, error_message='Quantidade de produto é maior que zero')
             execute_delete_prd(empresa_id=empresa_id, produto_id=produto_id)
         return {}
+    except HTTPException as http_exception:
+        raise http_exception
     except Exception as ex:
         logging.error(ex)
         raise ApiError()

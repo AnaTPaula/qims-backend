@@ -11,17 +11,17 @@ config = get_config()
 
 @handler_exception
 @token_required(tipos=['operador'], acessos=['total', 'modificar', 'leitura'], validate_empresa=True)
-def search(empresa_id: int, produto_id: int, nome: str = None):
+def search(empresa_id: int, nome: str = None):
     logging.info('Listando Estoques')
-    response = find(empresa_id=empresa_id, produto_id=produto_id, nome=nome)
+    response = find(empresa_id=empresa_id, nome=nome)
     return create_response(response=response, status=200)
 
 
 @handler_exception
 @token_required(tipos=['operador'], acessos=['total', 'modificar', 'leitura'], validate_empresa=True)
-def get(empresa_id: int, produto_id: int, estoque_id: int):
+def get(empresa_id: int, estoque_id: int):
     logging.info('Getting Estoque')
-    response = get_item(empresa_id=empresa_id, produto_id=produto_id, estoque_id=estoque_id)
+    response = get_item(empresa_id=empresa_id, estoque_id=estoque_id)
     if response:
         return create_response(response=response, status=200)
     else:
@@ -30,22 +30,20 @@ def get(empresa_id: int, produto_id: int, estoque_id: int):
 
 @handler_exception
 @token_required(tipos=['operador'], acessos=['total'], validate_empresa=True)
-def post(empresa_id: str, produto_id: int, body: dict):
+def post(empresa_id: str, body: dict):
     logging.info('Criando Estoque')
     validate_request(body=body)
     body['empresaId'] = empresa_id
-    body['produtoId'] = produto_id
     response = create(body=body)
     return create_response(response=response, status=201)
 
 
 @handler_exception
 @token_required(tipos=['operador'], acessos=['total', 'modificar'], validate_empresa=True)
-def put(empresa_id: str, produto_id: int, estoque_id: int, body: dict):
+def put(empresa_id: str, estoque_id: int, body: dict):
     logging.info('Atualizando Estoque')
     validate_request(body=body)
     body['empresaId'] = empresa_id
-    body['produtoId'] = produto_id
     body['id'] = estoque_id
     response = update(body=body)
     return create_response(response=response, status=200)
@@ -53,16 +51,13 @@ def put(empresa_id: str, produto_id: int, estoque_id: int, body: dict):
 
 @handler_exception
 @token_required(tipos=['operador'], acessos=['total'], validate_empresa=True)
-def delete(empresa_id: int, produto_id: int, estoque_id: int):
+def delete(empresa_id: int, estoque_id: int):
     logging.info('Deletando Estoque')
-    response = remove(empresa_id=empresa_id, produto_id=produto_id, estoque_id=estoque_id)
-    if response:
-        return create_response(response={}, status=200)
-    else:
-        raise ApiError(error_code=404, error_message='Estoque não encontrado')
+    remove(empresa_id=empresa_id, estoque_id=estoque_id)
+    return create_response(response={}, status=200)
 
 
-def options(empresa_id: int, produto_id: int):
+def options(empresa_id: int):
     response = make_response('{}', 200)
     response.headers['Access-Control-Allow-Origin'] = config.origin
     response.headers['Access-Control-Allow-Methods'] = 'PUT, GET, DELETE, POST, OPTIONS'
@@ -70,7 +65,7 @@ def options(empresa_id: int, produto_id: int):
     return response
 
 
-def options_id(empresa_id: int, produto_id: int, estoque_id: int):
+def options_id(empresa_id: int, estoque_id: int):
     response = make_response('{}', 200)
     response.headers['Access-Control-Allow-Origin'] = config.origin
     response.headers['Access-Control-Allow-Methods'] = 'PUT, GET, DELETE, POST, OPTIONS'
@@ -83,5 +78,3 @@ def validate_request(body: dict):
         ApiError(error_code=400, error_message='Nome invalido.')
     if body.get('descricao') and len(body['descricao']) > 200:
         ApiError(error_code=400, error_message='Descrição invalida.')
-    if not body.get('localizacao') or len(body['localizacao']) > 100:
-        ApiError(error_code=400, error_message='Nome invalido.')

@@ -11,7 +11,7 @@ config = get_config()
 
 @handler_exception
 @token_required(tipos=['operador'], acessos=['total', 'modificar', 'leitura'], validate_empresa=True)
-def search(empresa_id: int, nome: str = None):
+def search(empresa_id: str, nome: str = None):
     logging.info('Listando Produtos')
     response = find(empresa_id=empresa_id, nome=nome)
     return create_response(response=response, status=200)
@@ -30,7 +30,7 @@ def get(empresa_id: int, produto_id: int):
 
 @handler_exception
 @token_required(tipos=['operador'], acessos=['total'], validate_empresa=True)
-def post(empresa_id: int, body: dict):
+def post(empresa_id: str, body: dict):
     logging.info('Criando Produto')
     validate_request(body=body)
     body['empresaId'] = empresa_id
@@ -78,7 +78,7 @@ def validate_request(body: dict):
         ApiError(error_code=400, error_message='Nome invalido.')
     if body.get('descricao') and len(body['descricao']) > 255:
         ApiError(error_code=400, error_message='Descrição invalida.')
-    if not body.get('preco') and isinstance(body.get('preco'), float):
+    if not body.get('preco') or not isinstance(body.get('preco'), float):
         ApiError(error_code=400, error_message='Preço invalido.')
     if not body.get('unidade') or len(body['unidade']) > 25:
         ApiError(error_code=400, error_message='Unidade invalida.')
