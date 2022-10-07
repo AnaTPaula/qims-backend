@@ -66,6 +66,7 @@ def get_usuario(body: dict):
             ApiError(error_code=401, error_message='Senha ou nome de usuário inválidos.')
         items = query_all_operador(empresa_id=empresa.get('id'), nome=body['nomeUsuario'])
         usuario = items[0] if items else None
+        usuario['tipoArmazenagem'] = empresa.get('tipo_armazenagem')
     elif tipo == 'administrador':
         items = query_all_adm(nome=body['nomeUsuario'])
         usuario = items[0] if items else None

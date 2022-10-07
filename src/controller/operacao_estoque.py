@@ -16,7 +16,7 @@ def change(empresa_id: int, usuario_id: int, body: dict):
     validate_request(body=body)
     body['empresaId'] = empresa_id
     body['usuarioId'] = usuario_id
-    if body['tipo'] == 'ENTRADA':
+    if body['tipoOperacao'] == 'ENTRADA':
         response = increase_estoque(body=body)
     else:
         response = decrease_estoque(body=body)
@@ -32,16 +32,16 @@ def options(empresa_id: int):
 
 
 def validate_request(body: dict):
-    if body.get('tipo') not in ['ENTRADA', 'SAIDA']:
+    if body.get('tipoOperacao') not in ['ENTRADA', 'SAIDA']:
         ApiError(error_code=400, error_message='Tipo invalido.')
-    if body.get('tipo') == 'ENTRADA':
+    if body.get('tipoOperacao') == 'ENTRADA':
         if not body.get('loteId') or not isinstance(body.get('loteId'), int):
             ApiError(error_code=400, error_message='Lote invalido.')
-        if not body.get('localizacao') or len(body['localizacao']) > 100:
+        if body.get('localizacao') and len(body['localizacao']) > 100:
             ApiError(error_code=400, error_message='Localizacao invalida.')
 
-    if body.get('tipo') == 'SAIDA':
-        if not body.get('quantidade') or not isinstance(body.get('quantidade'), float):
+    if body.get('tipoOperacao') == 'SAIDA':
+        if not body.get('quantidade') or body.get('quantidade') < 0:
             ApiError(error_code=400, error_message='Quantidade invalida.')
 
     if not body.get('produtoId') or not isinstance(body.get('produtoId'), int):

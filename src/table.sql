@@ -44,9 +44,9 @@ create table IF NOT EXISTS produto(
     preco float not null,
     descricao character varying(200),
     unidade character varying(25) not null,
-    estoque_minimo float not null,
-    estoque_maximo float not null,
-    ponto_reposicao float not null,
+    estoque_minimo float,
+    estoque_maximo float,
+    ponto_reposicao float,
     empresa_fk bigint not null references empresa(usuario_fk) on update cascade on delete cascade,
     constraint _nome_produto_uc unique(nome, empresa_fk)
 );
@@ -56,11 +56,20 @@ create table IF NOT EXISTS produto(
 create table IF NOT EXISTS estoque(
     id serial primary key,
     nome character varying(100) not null,
-    quantidade float not null,
     descricao character varying(200),
-    localizacao character varying(100) not null,
+    empresa_fk bigint not null references empresa(usuario_fk) on update cascade on delete cascade,
+    constraint _nome_estoque_uc unique(nome, empresa_fk)
+);
+
+-- PRODUTO ESTOQUE
+create table IF NOT EXISTS produto_estoque(
+    id serial primary key,
+    quantidade float not null,
+    localizacao character varying(100),
     produto_fk bigint not null references produto(id) on update cascade,
-    empresa_fk bigint not null references empresa(usuario_fk) on update cascade on delete cascade
+    estoque_fk bigint not null references estoque(id) on update cascade,
+    empresa_fk bigint not null references empresa(usuario_fk) on update cascade on delete cascade,
+    constraint _produto_estoque_uc unique(produto_fk, estoque_fk, empresa_fk)
 );
 
 
@@ -91,7 +100,8 @@ create table IF NOT EXISTS lote(
 
 -- ESTOQUE LOTE
 create table IF NOT EXISTS estoque_lote(
-    estoque_fk bigint not null references estoque(id) on update cascade,
+    produto_estoque_fk bigint not null references produto_estoque(id) on update cascade,
     lote_fk bigint not null references lote(id) on update cascade,
-    empresa_fk bigint not null references empresa(usuario_fk) on update cascade on delete cascade
+    empresa_fk bigint not null references empresa(usuario_fk) on update cascade on delete cascade,
+    constraint _produto_estoque_lote_uc unique(produto_estoque_fk, lote_fk, empresa_fk)
 );

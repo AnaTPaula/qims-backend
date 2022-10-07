@@ -78,7 +78,7 @@ def validate_request(body: dict):
         ApiError(error_code=400, error_message='Nome invalido.')
     if body.get('descricao') and len(body['descricao']) > 255:
         ApiError(error_code=400, error_message='Descrição invalida.')
-    if not body.get('preco') or not isinstance(body.get('preco'), float):
+    if not body.get('preco') or body.get('preco') < 0:
         ApiError(error_code=400, error_message='Preço invalido.')
     if not body.get('unidade') or len(body['unidade']) > 25:
         ApiError(error_code=400, error_message='Unidade invalida.')

@@ -78,8 +78,8 @@ def validate_request(body: dict):
         ApiError(error_code=400, error_message='Data entrada inválidas.')
     if body.get('dataValidade') and body.get('dataValidade') < 0:
         ApiError(error_code=400, error_message='Data Validade inválida.')
-    if not body.get('codigoLote') or len(body['codigoLote']) > 50:
+    if not body.get('codigoLote') or len(body['codigoLote']) > 100:
         ApiError(error_code=400, error_message='Código inválido.')
-    if not body.get('quantidade') and body.get('dataValidade') < 0:
+    if not body.get('quantidade') and body.get('quantidade') < 0:
         ApiError(error_code=400, error_message='Quantidade inválida.')
 

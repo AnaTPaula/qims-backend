@@ -39,7 +39,7 @@ def increase_estoque(body: dict):
         if not produto_estoque:
             produto_estoque = {
                 'quantidade': 0.0,
-                'localizacao': body['localizacao'],
+                'localizacao': body.get('localizacao'),
                 'produtoId': body['produtoId'],
                 'estoqueId': body['estoqueId'],
                 'empresaId': body['empresaId'],

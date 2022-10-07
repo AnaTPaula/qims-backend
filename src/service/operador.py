@@ -73,6 +73,24 @@ def update(body: dict):
         raise ApiError()
 
 
+def update_senha(body: dict):
+    try:
+        item = query_one_operador(empresa_id=body['empresaId'], usuario_id=body['id'])
+        item = OperadorHelper.serialize(item) if item else None
+        if item:
+            if body.get('senha'):
+                item['senha'] = UsuarioHelper.set_hash_password(body['senha'])
+                execute_update_user(item=item)
+        else:
+            raise ApiError(error_code=404, error_message='Usuário não encontrado.')
+        return {}
+    except HTTPException as http_exception:
+        raise http_exception
+    except Exception as ex:
+        logging.error(ex)
+        raise ApiError()
+
+
 def remove(operador_id: int, empresa_id: int):
     try:
         item = query_one_operador(usuario_id=operador_id, empresa_id=empresa_id)
