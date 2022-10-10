@@ -409,6 +409,91 @@ paths:
           description: "Não autorizado"
         "404":
           description: "Não encontrado"
+
+  /empresa/{empresa_id}/produto/{produto_id}/estoque:
+    options:
+      x-swagger-router-controller: controller.produto_estoque
+      operationId: options_produto
+      produces:
+        - "application/json"
+      parameters:
+        - in: "path"
+          name: "empresa_id"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "produto_id"
+          required: true
+          type: "string"
+      summary: CORS suporte
+      description: Habilita o CORS retornando os cabeçalhos corretos
+      responses:
+        200:
+          description: Metodo generico para CORS
+    get:
+      x-swagger-router-controller: controller.produto_estoque
+      operationId: search_produto
+      produces:
+        - "application/json"
+      parameters:
+        - in: "path"
+          name: "empresa_id"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "produto_id"
+          required: true
+          type: "string"
+      responses:
+        "200":
+          description: "OK"
+        "401":
+          description: "Não autorizado"
+        "404":
+          description: "Não encontrado"
+
+  /empresa/{empresa_id}/estoque/{estoque_id}/produto:
+    options:
+      x-swagger-router-controller: controller.produto_estoque
+      operationId: options_estoque
+      produces:
+        - "application/json"
+      parameters:
+        - in: "path"
+          name: "empresa_id"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "estoque_id"
+          required: true
+          type: "string"
+      summary: CORS suporte
+      description: Habilita o CORS retornando os cabeçalhos corretos
+      responses:
+        200:
+          description: Metodo generico para CORS
+    get:
+      x-swagger-router-controller: controller.produto_estoque
+      operationId: search_estoque
+      produces:
+        - "application/json"
+      parameters:
+        - in: "path"
+          name: "empresa_id"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "estoque_id"
+          required: true
+          type: "string"
+      responses:
+        "200":
+          description: "OK"
+        "401":
+          description: "Não autorizado"
+        "404":
+          description: "Não encontrado"
+
   /empresa/{empresa_id}/lote:
     options:
       x-swagger-router-controller: controller.lote
@@ -571,6 +656,47 @@ paths:
         "404":
           description: "Não encontrado"
 
+  /empresa/{empresa_id}/estatistica:
+    options:
+      x-swagger-router-controller: controller.estatistica
+      operationId: options_id
+      produces:
+        - "application/json"
+      parameters:
+        - in: "path"
+          name: "empresa_id"
+          required: true
+          type: "string"
+      summary: CORS suporte
+      description: Habilita o CORS retornando os cabeçalhos corretos
+      responses:
+        200:
+          description: Metodo generico para CORS
+    post:
+      x-swagger-router-controller: controller.estatistica
+      operationId: search
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "path"
+          name: "empresa_id"
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            type: object
+      responses:
+        "200":
+          description: "Ok"
+        "400":
+          description: "Request Inválida"
+        "401":
+          description: "Não autorizado"
+
   /empresa/{empresa_id}/operador:
     options:
       x-swagger-router-controller: controller.operador
@@ -727,113 +853,6 @@ paths:
       responses:
         "200":
           description: "OK"
-        "400":
-          description: "Dados Inválidos"
-        "401":
-          description: "Não autorizado"
-        "404":
-          description: "Não encontrado"
-  /empresa/{empresa_id}/operador/{operador_id}:
-    options:
-      x-swagger-router-controller: controller.operador
-      operationId: options_id
-      produces:
-        - "application/json"
-      parameters:
-        - in: "path"
-          name: "empresa_id"
-          required: true
-          type: "string"
-        - in: "path"
-          name: "operador_id"
-          required: true
-          type: "string"
-      summary: CORS suporte
-      description: Habilita o CORS retornando os cabeçalhos corretos
-      responses:
-        200:
-          description: Metodo generico para CORS
-    get:
-      x-swagger-router-controller: controller.operador
-      operationId: get
-      produces:
-        - "application/json"
-      parameters:
-        - in: "path"
-          name: "empresa_id"
-          required: true
-          type: "string"
-        - in: "path"
-          name: "operador_id"
-          required: true
-          type: "string"
-      responses:
-        "200":
-          description: "OK"
-          schema:
-            $ref: "#/definitions/operador"
-        "401":
-          description: "Não autorizado"
-        "404":
-          description: "Não encontrado"
-    put:
-      x-swagger-router-controller: controller.operador
-      operationId: put
-      consumes:
-        - "application/json"
-      produces:
-        - "application/json"
-      parameters:
-        - in: "path"
-          name: "empresa_id"
-          required: true
-          type: "string"
-        - in: "path"
-          name: "operador_id"
-          required: true
-          type: "string"
-        - in: "body"
-          name: "body"
-          required: true
-          schema:
-            $ref: "#/definitions/operador"
-      responses:
-        "200":
-          description: "OK"
-          schema:
-            $ref: "#/definitions/operador"
-        "400":
-          description: "Dados Inválidos"
-        "401":
-          description: "Não autorizado"
-        "404":
-          description: "Não encontrado"
-    patch:
-      x-swagger-router-controller: controller.operador
-      operationId: patch
-      consumes:
-        - "application/json"
-      produces:
-        - "application/json"
-      parameters:
-        - in: "path"
-          name: "empresa_id"
-          required: true
-          type: "string"
-        - in: "path"
-          name: "operador_id"
-          required: true
-          type: "string"
-        - in: "body"
-          name: "body"
-          required: true
-          schema:
-            $ref: "#/definitions/operador"
-      responses:
-        "200":
-          description: "OK"
-          schema:
-            $ref: "#/definitions/operador"
         "400":
           description: "Dados Inválidos"
         "401":

@@ -10,6 +10,7 @@ class HistoricoHelper:
             'registroOperador': item.get('registro_operador'),
             'produtoId': item.get('produto_fk'),
             'estoque': item.get('nome_estoque'),
+            'estoqueDestino': item.get('nome_estoque_destino'),
             'quantidade': item.get('quantidade'),
             'empresaId': item.get('empresa_fk'),
             'operacao': item.get('operacao'),
@@ -23,7 +24,10 @@ def query_all_historico(empresa_id: int, produto_id: int):
 
 
 def execute_create_historico(item: dict):
-    query = "INSERT INTO historico (registro_operador, nome_operador, nome_estoque, quantidade, operacao, " \
-            "produto_fk, empresa_fk) VALUES (%s, %s, %s, %s, %s, %s, %s); "
-    database.execute(query=query, params=(item['registroOperador'], item['nomeOperador'], item['nomeEstoque'],
-                                          item['quantidade'], item['operacao'],item['produtoId'], item['empresaId']))
+    query = "INSERT INTO historico (registro_operador, nome_operador, nome_estoque, estoque_id, " \
+            "nome_estoque_destino, estoque_id_destino, quantidade, operacao, nome_produto, produto_fk, empresa_fk)" \
+            " VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s); "
+    database.execute(query=query, params=(item['usuarioId'], item['nomeOperador'], item['nomeEstoque'],
+                                          item['estoqueId'], item.get('nomeEstoqueDestino'),
+                                          item.get('estoqueIdDestino'), item['quantidade'], item['operacao'],
+                                          item['nomeProduto'], item['produtoId'], item['empresaId'],))

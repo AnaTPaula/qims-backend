@@ -4,7 +4,7 @@ from flask import make_response
 
 from config import get_config
 from controller.api_helper import ApiError, handler_exception, create_response, token_required
-from service.operacao_estoque import increase_estoque, decrease_estoque
+from service.operacao_estoque import increase_estoque, decrease_estoque, move_estoque
 
 config = get_config()
 
@@ -12,15 +12,17 @@ config = get_config()
 @handler_exception
 @token_required(tipos=['operador'], acessos=['total', 'modificar'], validate_empresa=True, get_id=True)
 def change(empresa_id: int, usuario_id: int, body: dict):
-    logging.info('Alterando Estoques')
+    logging.info(f'Operacoes do Estoques :{body.get("tipoOperacao")}')
     validate_request(body=body)
     body['empresaId'] = empresa_id
     body['usuarioId'] = usuario_id
     if body['tipoOperacao'] == 'ENTRADA':
-        response = increase_estoque(body=body)
-    else:
-        response = decrease_estoque(body=body)
-    return create_response(response=response, status=200)
+        increase_estoque(body=body)
+    elif body['tipoOperacao'] == 'SAIDA':
+        decrease_estoque(body=body)
+    elif body['tipoOperacao'] == 'TRANSFERENCIA':
+        move_estoque(body=body)
+    return create_response(response={}, status=200)
 
 
 def options(empresa_id: int):
@@ -32,7 +34,7 @@ def options(empresa_id: int):
 
 
 def validate_request(body: dict):
-    if body.get('tipoOperacao') not in ['ENTRADA', 'SAIDA']:
+    if body.get('tipoOperacao') not in ['ENTRADA', 'SAIDA', 'TRANSFERENCIA']:
         ApiError(error_code=400, error_message='Tipo invalido.')
     if body.get('tipoOperacao') == 'ENTRADA':
         if not body.get('loteId') or not isinstance(body.get('loteId'), int):
@@ -40,11 +42,20 @@ def validate_request(body: dict):
         if body.get('localizacao') and len(body['localizacao']) > 100:
             ApiError(error_code=400, error_message='Localizacao invalida.')
 
-    if body.get('tipoOperacao') == 'SAIDA':
+    if body.get('tipoOperacao') in ['SAIDA', 'TRANSFERENCIA']:
         if not body.get('quantidade') or body.get('quantidade') < 0:
             ApiError(error_code=400, error_message='Quantidade invalida.')
 
     if not body.get('produtoId') or not isinstance(body.get('produtoId'), int):
         ApiError(error_code=400, error_message='Produto invalido.')
-    if not body.get('estoqueId') or not isinstance(body.get('estoqueId'), int):
-        ApiError(error_code=400, error_message='Estoque invalido.')
+
+    if body.get('tipoOperacao') in ['ENTRADA', 'SAIDA']:
+        if not body.get('estoqueId') or not isinstance(body.get('estoqueId'), int):
+            ApiError(error_code=400, error_message='Estoque invalido.')
+    else:
+        if not body.get('estoqueOrigemId') or not isinstance(body.get('estoqueOrigemId'), int):
+            ApiError(error_code=400, error_message='Estoque de Origem invalido.')
+        if not body.get('estoqueDestinoId') or not isinstance(body.get('estoqueDestinoId'), int):
+            ApiError(error_code=400, error_message='Estoque de Destino invalido.')
+        if body.get('estoqueOrigemId') == body.get('estoqueDestinoId'):
+            ApiError(error_code=400, error_message='Os estoques devem ser diferentes.')

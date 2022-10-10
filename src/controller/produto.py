@@ -11,7 +11,7 @@ config = get_config()
 
 @handler_exception
 @token_required(tipos=['operador'], acessos=['total', 'modificar', 'leitura'], validate_empresa=True)
-def search(empresa_id: str, nome: str = None):
+def search(empresa_id: int, nome: str = None):
     logging.info('Listando Produtos')
     response = find(empresa_id=empresa_id, nome=nome)
     return create_response(response=response, status=200)

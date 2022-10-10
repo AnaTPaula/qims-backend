@@ -79,9 +79,13 @@ create table IF NOT EXISTS historico(
     registro_operador bigint not null,
     nome_operador character varying(100) not null,
     nome_estoque character varying(100) not null,
+    estoque_id bigint not null,
+    nome_estoque_destino character varying(100),
+    estoque_id_destino bigint,
     quantidade float not null,
     data_hora bigint not null default extract(epoch from now()),
     operacao character varying(100) not null,
+    nome_produto character varying(100) not null,
     produto_fk bigint not null references produto(id) on update cascade,
     empresa_fk bigint not null references empresa(usuario_fk) on update cascade on delete cascade
 );

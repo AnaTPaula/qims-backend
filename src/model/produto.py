@@ -19,7 +19,7 @@ class ProdutoHelper:
         }
 
 
-def query_all_prd(empresa_id: str, nome: str):
+def query_all_prd(empresa_id: int, nome: str):
     query = "select p.*, COALESCE(sum(pe.quantidade), 0) as quantidade from produto p left join produto_estoque pe " \
             "on p.id = pe.produto_fk where p.empresa_fk = %s"
     if nome:

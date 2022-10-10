@@ -6,7 +6,7 @@ from model.produto import ProdutoHelper, query_all_prd, execute_create_prd, exec
 from werkzeug.exceptions import HTTPException
 
 
-def find(empresa_id: str, nome: str):
+def find(empresa_id: int, nome: str):
     try:
         items = query_all_prd(empresa_id=empresa_id, nome=nome)
         return [ProdutoHelper.serialize(item) for item in items]
