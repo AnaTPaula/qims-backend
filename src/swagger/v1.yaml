@@ -836,6 +836,38 @@ paths:
           description: "Não autorizado"
         "404":
           description: "Não encontrado"
+    patch:
+      x-swagger-router-controller: controller.operador
+      operationId: patch
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "path"
+          name: "empresa_id"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "operador_id"
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            type: "object"
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/operador"
+        "400":
+          description: "Dados Inválidos"
+        "401":
+          description: "Não autorizado"
+        "404":
+          description: "Não encontrado"
     delete:
       x-swagger-router-controller: controller.operador
       operationId: delete
