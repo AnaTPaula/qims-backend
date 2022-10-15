@@ -1,19 +1,12 @@
 import logging
 from os import getenv
-
-from connexion import App
-from connexion.resolver import RestyResolver
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 from psycopg2 import connect, DatabaseError
 from psycopg2.extras import DictCursor
-
-from model.model import Base
 
 
 class Config:
     def __init__(self):
-        self.secret = 'kjasdhjwdiqw7121#$79*lacfkw*/'
+        self.secret = getenv('SECRET', 'kjasdhjwdiqw7121#$79*lacfkw*/')
         self.logging_level = None
         self.debug = None
         self.app = None
@@ -25,19 +18,9 @@ class Config:
         self.database_name = None
 
     def create_table(self):
-        # engine = self.__get_engine()
-        # Base.metadata.create_all(engine)
         with open('table.sql') as file:
             script = file.read()
         database.execute(script)
-
-    def get_session(self):
-        engine = self.__get_engine()
-        Base.metadata.bind = engine
-        return sessionmaker(bind=engine)()
-
-    def __get_engine(self):
-        return create_engine(self.database_url)
 
 
 class Localconfig(Config):
@@ -58,31 +41,20 @@ class Localconfig(Config):
 class ProductionConfig(Config):
     def __init__(self):
         super().__init__()
-        self.port_host = 8000
+        self.port_host = 8080
         self.debug = False
         self.logging_level = logging.INFO
-        # TODO: change it when configure prod environment.
-        self.origin = 'http://localhost:4200'
-        self.database_url = 'postgresql+psycopg2://postgres:postgres@localhost:5432/qim'
-        self.database_host = 'localhost'
-        self.database_username = 'postgres'
-        self.database_password = 'postgres'
-        self.database_port = '5432'
-        self.database_name = 'qim'
+        self.origin = getenv('ORIGIN')
+        self.database_host = getenv('RDS_HOSTNAME')
+        self.database_username = getenv('RDS_USERNAME')
+        self.database_password = getenv('RDS_PASSWORD')
+        self.database_port = getenv('RDS_PORT')
+        self.database_name = getenv('RDS_DB_NAME')
 
 
 def get_config():
     env = getenv('ENV', 'local')
     return ProductionConfig() if 'prod' == env else Localconfig()
-
-
-def config_application(config: Config):
-    options = {'swagger_url': '/'}
-    app = App(__name__, specification_dir='swagger/', options=options)
-    app.add_api('v1.yaml', base_path='/v1', resolver=RestyResolver('controller'), strict_validation=False)
-    app.secret_key = config.secret
-    app.debug = config.debug
-    return app
 
 
 class Database:

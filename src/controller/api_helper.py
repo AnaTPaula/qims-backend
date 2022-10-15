@@ -13,7 +13,7 @@ config = get_config()
 
 def create_response(response: dict, status: int):
     response = make_response(dumps(response), status)
-    response.headers['Access-Control-Allow-Origin'] = 'http://localhost:4200'
+    response.headers['Access-Control-Allow-Origin'] = config.origin
     response.headers['Access-Control-Allow-Credentials'] = True
     return response
 
