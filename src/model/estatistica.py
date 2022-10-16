@@ -29,7 +29,7 @@ def query_produtos_estoque_maximo(empresa_id: int):
     query = "select p.nome as produto, COALESCE(sum(pe.quantidade),0) as quantidade, p.estoque_maximo as maximo " \
             "from produto p left join produto_estoque pe " \
             "on pe.produto_fk = p.id where p.empresa_fk = %s and p.estoque_maximo > 0 group by p.id " \
-            "having COALESCE(sum(pe.quantidade),0) >= p.estoque_maximo;"
+            "having COALESCE(sum(pe.quantidade),0) >= p.estoque_maximo order by produto asc;"
     return database.select_all(query=query, params=(empresa_id,))
 
 
@@ -38,7 +38,7 @@ def query_produtos_ponto_reposicao(empresa_id: int):
             "from produto p left join produto_estoque pe " \
             "on pe.produto_fk = p.id where p.empresa_fk = %s and p.ponto_reposicao > 0 group by p.id " \
             "having COALESCE(sum(pe.quantidade),0) <= p.ponto_reposicao " \
-            "and COALESCE(sum(pe.quantidade),0) > p.estoque_minimo;"
+            "and COALESCE(sum(pe.quantidade),0) > p.estoque_minimo order by produto asc;"
     return database.select_all(query=query, params=(empresa_id,))
 
 
@@ -46,19 +46,21 @@ def query_produtos_estoque_minimo(empresa_id: int):
     query = "select p.nome as produto, COALESCE(sum(pe.quantidade),0) as quantidade, p.estoque_minimo as minimo " \
             "from produto p left join produto_estoque pe " \
             "on pe.produto_fk = p.id where p.empresa_fk = %s and p.estoque_minimo > 0 group by p.id " \
-            "having COALESCE(sum(pe.quantidade),0) <= p.estoque_minimo;"
+            "having COALESCE(sum(pe.quantidade),0) <= p.estoque_minimo order by produto asc;"
     return database.select_all(query=query, params=(empresa_id,))
 
 
 def query_entrada_produtos(empresa_id: int):
     query = "select p.nome, qtd.quantidade from (select h.produto_fk, COALESCE(sum(h.quantidade),0) as quantidade " \
             "from historico h where h.empresa_fk = %s and h.operacao = 'ENTRADA' " \
-            "group by h.produto_fk LIMIT 10) qtd inner join produto p on p.id = qtd.produto_fk;"
+            "group by h.produto_fk LIMIT 10) qtd inner join produto p on p.id = qtd.produto_fk" \
+            "order by qtd.quantidade desc;"
     return database.select_all(query=query, params=(empresa_id,))
 
 
 def query_saida_produtos(empresa_id: int):
     query = "select p.nome, qtd.quantidade from (select h.produto_fk, COALESCE(sum(h.quantidade),0) as quantidade " \
             "from historico h where h.empresa_fk = %s and h.operacao = 'SAIDA' " \
-            "group by h.produto_fk LIMIT 10) qtd inner join produto p on p.id = qtd.produto_fk;"
+            "group by h.produto_fk LIMIT 10) qtd inner join produto p on p.id = qtd.produto_fk" \
+            "order by qtd.quantidade desc;"
     return database.select_all(query=query, params=(empresa_id,))
