@@ -17,9 +17,10 @@ class OperadorHelper:
 
 def query_all_operador(empresa_id: int, nome: str = None):
     query = "SELECT o.nome_usuario, o.tipo_acesso, o.empresa_fk, u.id, u.tipo, u.senha, u.data_cadastro " \
-            "from operador o JOIN usuario u ON o.usuario_fk = u.id WHERE empresa_fk = %s"
+            "from operador o JOIN usuario u ON o.usuario_fk = u.id WHERE empresa_fk = %s "
     if nome:
         query += " AND nome_usuario = %s;"
+    query += " order by o.nome_usuario asc "
     params = (empresa_id, nome,) if nome else (empresa_id,)
     return database.select_all(query=query, params=params)
 

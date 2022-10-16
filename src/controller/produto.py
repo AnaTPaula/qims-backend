@@ -82,11 +82,19 @@ def validate_request(body: dict):
         ApiError(error_code=400, error_message='Preço invalido.')
     if not body.get('unidade') or len(body['unidade']) > 25:
         ApiError(error_code=400, error_message='Unidade invalida.')
-    if body.get('estoqueMaximo') and body.get('estoqueMinimo') and body.get('estoqueMaximo') < body.get('estoqueMinimo'):
+    if body.get('estoqueMaximo') and body.get('estoqueMaximo') < 0:
+        ApiError(error_code=400, error_message='estoqueMaximo invalido.')
+    if body.get('estoqueMinimo') and body.get('estoqueMinimo') < 0:
+        ApiError(error_code=400, error_message='estoqueMinimo invalido.')
+    if body.get('pontoReposicao') and body.get('pontoReposicao') < 0:
+        ApiError(error_code=400, error_message='pontoReposicao invalido.')
+
+    if body.get('estoqueMaximo') and body.get('estoqueMinimo') and body.get('estoqueMaximo') <= body.get(
+            'estoqueMinimo'):
         ApiError(error_code=400, error_message='Estoque máximo menor que estoque minimo')
-    if body.get('estoqueMaximo') and body.get('pontoReposicao') and body.get('estoqueMaximo') < body.get('pontoReposicao'):
+    if body.get('estoqueMaximo') and body.get('pontoReposicao') and body.get('estoqueMaximo') <= body.get(
+            'pontoReposicao'):
         ApiError(error_code=400, error_message='Estoque máximo menor que ponto reposição')
-    if not body.get('estoqueMaximo') and body.get('estoqueMinimo') > 0:
-        ApiError(error_code=400, error_message='Estoque máximo menor que estoque minimo')
-    if body.get('pontoReposicao') and body.get('estoqueMinimo') and body.get('pontoReposicao') < body.get('estoqueMinimo'):
-       ApiError(error_code=400, error_message='Ponto reposição menor que estoque minimo')
+    if body.get('pontoReposicao') and body.get('estoqueMinimo') and body.get('pontoReposicao') <= body.get(
+            'estoqueMinimo'):
+        ApiError(error_code=400, error_message='Ponto reposição menor que estoque minimo')

@@ -19,7 +19,7 @@ def query_all_estoque(empresa_id: int, nome: str = None):
             "on e.id = pe.estoque_fk WHERE e.empresa_fk = %s "
     if nome:
         query += " AND nome = %s"
-    query += "group by e.id;"
+    query += "group by e.id order by e.nome asc;"
     params = (empresa_id, nome,) if nome else (empresa_id,)
     return database.select_all(query=query, params=params)
 
