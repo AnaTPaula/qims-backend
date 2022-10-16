@@ -4,7 +4,7 @@ from flask import make_response
 
 from config import get_config
 from controller.api_helper import handler_exception, create_response, token_required
-from service.estatistica import get_info
+from service.estatistica import get_info, get_curva_abc
 
 config = get_config()
 
@@ -13,7 +13,10 @@ config = get_config()
 @token_required(tipos=['empresa'], validate_empresa=True)
 def search(empresa_id: int, body: dict):
     logging.info('Getting informações da conta')
-    response = get_info(empresa_id=empresa_id)
+    if body.get('tipo') and body['tipo'] == 'curva':
+        response = get_curva_abc(empresa_id=empresa_id)
+    else:
+        response = get_info(empresa_id=empresa_id)
     return create_response(response=response, status=200)
 
 

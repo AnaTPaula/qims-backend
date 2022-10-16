@@ -37,7 +37,7 @@ class ProdutoEstoqueHelper:
         }
 
 def query_all_produto_estoque(empresa_id: int, produto_id: int):
-    query = " SELECT * from produto_estoque WHERE empresa_fk = %s AND produto_fk = %s"
+    query = " SELECT * from produto_estoque WHERE empresa_fk = %s AND produto_fk = %s order by nome_produto"
     return database.select_all(query=query, params=(empresa_id, produto_id,))
 
 
@@ -45,7 +45,7 @@ def query_all_produto_estoque_for_produto(empresa_id: int, produto_id: int):
     query = "SELECT p.id as produto_id, p.nome as nome_produto, p.empresa_fk as empresa_id, " \
             "COALESCE(pe.quantidade, 0) as quantidade, pe.localizacao, e.nome as nome_estoque from produto p " \
             "left join produto_estoque pe on p.id = pe.produto_fk left join estoque e on pe.estoque_fk = e.id " \
-            "WHERE p.empresa_fk = %s AND p.id = %s"
+            "WHERE p.empresa_fk = %s AND p.id = %s order by e.nome"
     return database.select_all(query=query, params=(empresa_id, produto_id,))
 
 
@@ -53,7 +53,7 @@ def query_all_produto_estoque_for_estoque(empresa_id: int, estoque_id: int):
     query = " SELECT e.id as estoque_id, p.nome as nome_produto, e.empresa_fk as empresa_id, " \
             "COALESCE(pe.quantidade, 0) as quantidade, pe.localizacao, e.nome as nome_estoque from estoque e " \
             "left join produto_estoque pe on e.id = pe.estoque_fk left join produto p on pe.produto_fk = p.id " \
-            "WHERE e.empresa_fk = %s AND e.id = %s"
+            "WHERE e.empresa_fk = %s AND e.id = %s order by p.nome"
     return database.select_all(query=query, params=(empresa_id, estoque_id,))
 
 
