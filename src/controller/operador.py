@@ -4,7 +4,7 @@ from flask import make_response
 
 from config import get_config
 from controller.api_helper import ApiError, handler_exception, create_response, token_required
-from service.operador import find, get_item, create, update, remove
+from service.operador import find, get_item, create, update, update_senha, remove
 
 config = get_config()
 
@@ -46,6 +46,18 @@ def put(empresa_id: int, operador_id: int, body: dict):
     body['empresaId'] = empresa_id
     body['id'] = operador_id
     response = update(body=body)
+    return create_response(response=response, status=200)
+
+
+@handler_exception
+@token_required(tipos=['operador'], validate_operador=True)
+def patch(empresa_id: int, operador_id: int, body: dict):
+    logging.info('Atualizando senha Operador')
+    if not body.get('senha') or len(body['senha']) > 50:
+        ApiError(error_code=400, error_message='Senha invalida.')
+    body['empresaId'] = empresa_id
+    body['id'] = operador_id
+    response = update_senha(body=body)
     return create_response(response=response, status=200)
 
 

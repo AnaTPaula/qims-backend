@@ -9,14 +9,17 @@ class EstoqueHelper:
             'id': item.get('id'),
             'nome': item.get('nome'),
             'descricao': item.get('descricao'),
+            'quantidade': item.get('quantidade'),
             'empresaId': item.get('empresa_fk')
         }
 
 
 def query_all_estoque(empresa_id: int, nome: str = None):
-    query = " SELECT * from estoque WHERE empresa_fk = %s "
+    query = "SELECT e.*, COALESCE(sum(pe.quantidade), 0) as quantidade from estoque e left join produto_estoque pe " \
+            "on e.id = pe.estoque_fk WHERE e.empresa_fk = %s "
     if nome:
-        query += " AND nome = %s;"
+        query += " AND nome = %s"
+    query += "group by e.id;"
     params = (empresa_id, nome,) if nome else (empresa_id,)
     return database.select_all(query=query, params=params)
 

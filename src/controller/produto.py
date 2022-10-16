@@ -11,7 +11,7 @@ config = get_config()
 
 @handler_exception
 @token_required(tipos=['operador'], acessos=['total', 'modificar', 'leitura'], validate_empresa=True)
-def search(empresa_id: str, nome: str = None):
+def search(empresa_id: int, nome: str = None):
     logging.info('Listando Produtos')
     response = find(empresa_id=empresa_id, nome=nome)
     return create_response(response=response, status=200)
@@ -78,7 +78,15 @@ def validate_request(body: dict):
         ApiError(error_code=400, error_message='Nome invalido.')
     if body.get('descricao') and len(body['descricao']) > 255:
         ApiError(error_code=400, error_message='Descrição invalida.')
-    if not body.get('preco') or not isinstance(body.get('preco'), float):
+    if not body.get('preco') or body.get('preco') < 0:
         ApiError(error_code=400, error_message='Preço invalido.')
     if not body.get('unidade') or len(body['unidade']) > 25:
         ApiError(error_code=400, error_message='Unidade invalida.')
+    if body.get('estoqueMaximo') and body.get('estoqueMinimo') and body.get('estoqueMaximo') < body.get('estoqueMinimo'):
+        ApiError(error_code=400, error_message='Estoque máximo menor que estoque minimo')
+    if body.get('estoqueMaximo') and body.get('pontoReposicao') and body.get('estoqueMaximo') < body.get('pontoReposicao'):
+        ApiError(error_code=400, error_message='Estoque máximo menor que ponto reposição')
+    if not body.get('estoqueMaximo') and body.get('estoqueMinimo') > 0:
+        ApiError(error_code=400, error_message='Estoque máximo menor que estoque minimo')
+    if body.get('pontoReposicao') and body.get('estoqueMinimo') and body.get('pontoReposicao') < body.get('estoqueMinimo'):
+       ApiError(error_code=400, error_message='Ponto reposição menor que estoque minimo')

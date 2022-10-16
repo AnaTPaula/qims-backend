@@ -6,7 +6,7 @@ from model.produto import ProdutoHelper, query_all_prd, execute_create_prd, exec
 from werkzeug.exceptions import HTTPException
 
 
-def find(empresa_id: str, nome: str):
+def find(empresa_id: int, nome: str):
     try:
         items = query_all_prd(empresa_id=empresa_id, nome=nome)
         return [ProdutoHelper.serialize(item) for item in items]
@@ -33,9 +33,9 @@ def create(body: dict):
         'descricao': body.get('descricao'),
         'unidade': body['unidade'],
         'empresaId': body['empresaId'],
-        'estoqueMinimo': 0.0,
-        'estoqueMaximo': 0.0,
-        'pontoReposicao': 0.0
+        'estoqueMinimo': body.get('estoqueMinimo', 0.0),
+        'estoqueMaximo': body.get('estoqueMaximo', 0.0),
+        'pontoReposicao': body.get('pontoReposicao', 0.0),
     }
     try:
         execute_create_prd(item=item)
@@ -55,9 +55,9 @@ def update(body: dict):
             item['preco'] = body['preco']
             item['descricao'] = body.get('descricao')
             item['unidade'] = body['unidade']
-            item['estoqueMinimo'] = item['estoque_minimo']
-            item['estoqueMaximo'] = item['estoque_maximo']
-            item['pontoReposicao'] = item['ponto_reposicao']
+            item['estoqueMinimo'] = body.get('estoqueMinimo'),
+            item['estoqueMaximo'] = body.get('estoqueMaximo'),
+            item['pontoReposicao'] = body.get('pontoReposicao'),
             item['empresaId'] = body['empresaId']
             item['id'] = body['id']
             execute_update_prd(item=item)

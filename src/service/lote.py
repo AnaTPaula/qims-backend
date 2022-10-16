@@ -34,8 +34,8 @@ def create(body: dict):
         'empresaId': body['empresaId'],
     }
     try:
-        execute_create_lote(item=item)
-        return {}
+        lote_id = execute_create_lote(item=item)
+        return {'id': lote_id}
     except Exception as ex:
         logging.error(ex)
         raise ApiError()

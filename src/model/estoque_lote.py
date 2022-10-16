@@ -61,6 +61,13 @@ def execute_delete_lote(empresa_id: int, lote_id: int):
     database.execute(query=query, params=(empresa_id, lote_id,))
 
 
+def query_one_lote_by_produto_estoque(empresa_id: int, codigo_lote: str, produto_estoque_id: int):
+    query = "select l.* from lote l left join estoque_lote el on l.id = el.lote_fk left join " \
+            "produto_estoque pe on pe.id=el.produto_estoque_fk " \
+            "where l.empresa_fk = %s and l.codigo_lote = %s and pe.id = %s"
+    return database.select_one(query=query, params=(empresa_id, codigo_lote, produto_estoque_id,))
+
+
 def execute_create_estoque_lote(item: dict):
     query = "INSERT INTO estoque_lote (produto_estoque_fk, lote_fk, empresa_fk) VALUES " \
             "(%s, %s, %s);"

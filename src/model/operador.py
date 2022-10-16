@@ -10,6 +10,7 @@ class OperadorHelper:
             'nomeUsuario': item.get('nome_usuario'),
             'tipoAcesso': item.get('tipo_acesso'),
             'empresaId': item.get('empresa_fk'),
+            'tipoArmazenagem': item.get('tipoArmazenagem'),
             **UsuarioHelper.serialize(item)
         }
 
