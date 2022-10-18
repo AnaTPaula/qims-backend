@@ -1,13 +1,13 @@
 import logging
 
 from controller.api_helper import ApiError
-from model.lote import LoteHelper, query_all_lote, execute_create_lote, execute_update_lote, query_one_lote,\
-    execute_delete_lote
+from model.lote import LoteHelper, query_all_lote, execute_create_lote, execute_update_lote, query_one_lote, \
+    execute_delete_lote, query_all_lote_grouped
 
 
 def find(empresa_id: int, codigo_lote: str):
     try:
-        items = query_all_lote(empresa_id=empresa_id, codigo_lote=codigo_lote)
+        items = query_all_lote_grouped(empresa_id=empresa_id, codigo_lote=codigo_lote)
         return [LoteHelper.serialize(item) for item in items]
     except Exception as ex:
         logging.error(ex)

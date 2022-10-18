@@ -1207,8 +1207,6 @@ definitions:
         type: "string"
       preco:
         type: "number"
-      descricao:
-        type: "string"
       unidade:
         type: "string"
       estoque_minimo:

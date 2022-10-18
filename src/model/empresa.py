@@ -20,7 +20,8 @@ def query_all_empresa(nome: str = None):
     query = "SELECT e.nome_usuario, e.situacao_conta, e.tipo_armazenagem, e.aceite_termos_de_uso, e.razao_social," \
             " u.id, u.tipo, u.senha, u.data_cadastro from empresa e JOIN usuario u ON e.usuario_fk = u.id"
     if nome:
-        query += " WHERE nome_usuario = %s;"
+        query += " WHERE nome_usuario = %s "
+    query += " order by e.razao_social "
     return database.select_all(query=query, params=(nome,))
 
 

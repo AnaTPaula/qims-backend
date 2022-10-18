@@ -19,7 +19,7 @@ class HistoricoHelper:
 
 
 def query_all_historico(empresa_id: int, produto_id: int):
-    query = "SELECT h.* from historico h WHERE empresa_fk = %s AND produto_fk = %s"
+    query = "SELECT h.* from historico h WHERE empresa_fk = %s AND produto_fk = %s order by h.data_hora desc"
     return database.select_all(query=query, params=(empresa_id, produto_id,))
 
 

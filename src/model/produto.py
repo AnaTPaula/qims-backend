@@ -24,7 +24,7 @@ def query_all_prd(empresa_id: int, nome: str):
             "on p.id = pe.produto_fk where p.empresa_fk = %s"
     if nome:
         query += " AND nome = %s"
-    query += " group by p.id"
+    query += " group by p.id order by p.nome asc "
     params = (empresa_id, nome,) if nome else (empresa_id,)
     return database.select_all(query=query, params=params)
 

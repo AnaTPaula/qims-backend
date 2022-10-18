@@ -16,6 +16,20 @@ class LoteHelper:
         }
 
 
+def query_all_lote_grouped(empresa_id: int, codigo_lote: str):
+    query = "select distinct on (qty.codigo_lote) qty.codigo_lote, qty.quantidade, l.id, l.data_entrada, " \
+            "l.data_validade, l.empresa_fk, el.produto_estoque_fk from lote l join (select codigo_lote, " \
+            "coalesce(sum(quantidade),0) as quantidade from lote where empresa_fk = %s group by codigo_lote) as qty " \
+            "on l.codigo_lote = qty.codigo_lote left join estoque_lote el on l.id = el.lote_fk "
+    if codigo_lote:
+        query += " WHERE l.codigo_lote = %s "
+        params = (empresa_id, codigo_lote,)
+    else:
+        params = (empresa_id,)
+    query += " order by qty.codigo_lote;"
+    return database.select_all(query=query, params=params)
+
+
 def query_all_lote(empresa_id: int, codigo_lote: str):
     query = "select l.*, produto_estoque_fk from lote l left join estoque_lote el on l.id = el.lote_fk " \
             "where l.empresa_fk = %s "
