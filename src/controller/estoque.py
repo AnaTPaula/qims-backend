@@ -75,6 +75,6 @@ def options_id(empresa_id: int, estoque_id: int):
 
 def validate_request(body: dict):
     if not body.get('nome') or len(body['nome']) > 100:
-        ApiError(error_code=400, error_message='Nome invalido.')
+        ApiError(error_code=400, error_message='Nome inválido.')
     if body.get('descricao') and len(body['descricao']) > 200:
-        ApiError(error_code=400, error_message='Descrição invalida.')
+        ApiError(error_code=400, error_message='Descrição inválida.')

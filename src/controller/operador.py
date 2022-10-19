@@ -91,11 +91,11 @@ def options_id(empresa_id: str, operador_id: int):
 def validate_request(body: dict, created: bool):
     if created:
         if not body.get('senha') or len(body['senha']) > 50:
-            ApiError(error_code=400, error_message='Senha invalida.')
+            ApiError(error_code=400, error_message='Senha inválida.')
     else:
         if body.get('senha') and len(body['senha']) > 50:
-            ApiError(error_code=400, error_message='Senha invalida.')
+            ApiError(error_code=400, error_message='Senha inválida.')
     if not body.get('nomeUsuario') or len(body['nomeUsuario']) > 50:
-        ApiError(error_code=400, error_message='NomeUsuario invalido.')
+        ApiError(error_code=400, error_message='Nome do usuário inválido.')
     if not body.get('tipoAcesso') or body['tipoAcesso'] not in ['total', 'modificar', 'leitura']:
-        ApiError(error_code=400, error_message='TipoAcesso invalido.')
+        ApiError(error_code=400, error_message='Tipo de acesso inválido.')

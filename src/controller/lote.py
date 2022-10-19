@@ -75,11 +75,11 @@ def options_id(empresa_id: str, lote_id: int):
 
 def validate_request(body: dict):
     if not body.get('dataEntrada') or body.get('dataEntrada') < 0:
-        ApiError(error_code=400, error_message='Data entrada inválidas.')
+        ApiError(error_code=400, error_message='Data de entrada inválida.')
     if body.get('dataValidade') and body.get('dataValidade') < 0:
-        ApiError(error_code=400, error_message='Data Validade inválida.')
+        ApiError(error_code=400, error_message='Data de validade inválida.')
     if not body.get('codigoLote') or len(body['codigoLote']) > 100:
-        ApiError(error_code=400, error_message='Código inválido.')
+        ApiError(error_code=400, error_message='Código do lote inválido.')
     if not body.get('quantidade') and body.get('quantidade') < 0:
         ApiError(error_code=400, error_message='Quantidade inválida.')
 

@@ -97,15 +97,15 @@ def options_id_situacao(empresa_id: int):
 def validate_request(body: dict, created: bool):
     if created:
         if body.get('aceiteTermosUso') is None:
-            ApiError(error_code=400, error_message='aceiteTermosUso invalidos.')
+            ApiError(error_code=400, error_message='Aceite termos de uso inválidos.')
         if not body.get('senha') or len(body['senha']) > 50:
-            ApiError(error_code=400, error_message='Senha invalida.')
+            ApiError(error_code=400, error_message='Senha inválida.')
         if not body.get('tipoArmazenagem') or body['tipoArmazenagem'] not in ['FIFO', 'FEFO', 'LIFO']:
-            ApiError(error_code=400, error_message='TipoArmazenagem invalida.')
+            ApiError(error_code=400, error_message='Tipo de armazenagem inválida.')
     else:
         if body.get('senha') and len(body['senha']) > 50:
-            ApiError(error_code=400, error_message='Senha invalida.')
+            ApiError(error_code=400, error_message='Senha inválida.')
     if not body.get('nomeUsuario') or len(body['nomeUsuario']) > 50:
-        ApiError(error_code=400, error_message='NomeUsuario invalido.')
+        ApiError(error_code=400, error_message='Nome do usuário inválido.')
     if not body.get('razaoSocial') or len(body['razaoSocial']) > 50:
-        ApiError(error_code=400, error_message='razaoSocial invalido.')
+        ApiError(error_code=400, error_message='Razao social inválido.')

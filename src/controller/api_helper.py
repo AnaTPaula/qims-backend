@@ -28,7 +28,10 @@ def handler_exception(func):
         try:
             response = func(*args, **kwargs)
         except HTTPException as http_exception:
-            raise http_exception
+            return create_response(
+                response={'msg': http_exception.description},
+                status=http_exception.code
+            )
         except ApiError as api_error:
             raise api_error
         except Exception as ex:

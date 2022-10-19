@@ -35,27 +35,27 @@ def options(empresa_id: int):
 
 def validate_request(body: dict):
     if body.get('tipoOperacao') not in ['ENTRADA', 'SAIDA', 'TRANSFERENCIA']:
-        ApiError(error_code=400, error_message='Tipo invalido.')
+        ApiError(error_code=400, error_message='Tipo de operação inválida.')
     if body.get('tipoOperacao') == 'ENTRADA':
         if not body.get('loteId') or not isinstance(body.get('loteId'), int):
-            ApiError(error_code=400, error_message='Lote invalido.')
+            ApiError(error_code=400, error_message='Lote inválido.')
         if body.get('localizacao') and len(body['localizacao']) > 100:
-            ApiError(error_code=400, error_message='Localizacao invalida.')
+            ApiError(error_code=400, error_message='Localizacao inválida.')
 
     if body.get('tipoOperacao') in ['SAIDA', 'TRANSFERENCIA']:
         if not body.get('quantidade') or body.get('quantidade') < 0:
-            ApiError(error_code=400, error_message='Quantidade invalida.')
+            ApiError(error_code=400, error_message='Quantidade inválida.')
 
     if not body.get('produtoId') or not isinstance(body.get('produtoId'), int):
-        ApiError(error_code=400, error_message='Produto invalido.')
+        ApiError(error_code=400, error_message='Produto inválido.')
 
     if body.get('tipoOperacao') in ['ENTRADA', 'SAIDA']:
         if not body.get('estoqueId') or not isinstance(body.get('estoqueId'), int):
-            ApiError(error_code=400, error_message='Estoque invalido.')
+            ApiError(error_code=400, error_message='Estoque inválido.')
     else:
         if not body.get('estoqueOrigemId') or not isinstance(body.get('estoqueOrigemId'), int):
-            ApiError(error_code=400, error_message='Estoque de Origem invalido.')
+            ApiError(error_code=400, error_message='Estoque de Origem inválido.')
         if not body.get('estoqueDestinoId') or not isinstance(body.get('estoqueDestinoId'), int):
-            ApiError(error_code=400, error_message='Estoque de Destino invalido.')
+            ApiError(error_code=400, error_message='Estoque de Destino inválido.')
         if body.get('estoqueOrigemId') == body.get('estoqueDestinoId'):
             ApiError(error_code=400, error_message='Os estoques devem ser diferentes.')

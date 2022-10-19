@@ -75,26 +75,26 @@ def options_id(empresa_id: str, produto_id: int):
 
 def validate_request(body: dict):
     if not body.get('nome') or len(body['nome']) > 50:
-        ApiError(error_code=400, error_message='Nome invalido.')
+        ApiError(error_code=400, error_message='Nome inválido.')
     if body.get('descricao') and len(body['descricao']) > 255:
-        ApiError(error_code=400, error_message='Descrição invalida.')
+        ApiError(error_code=400, error_message='Descrição inválida.')
     if not body.get('preco') or body.get('preco') < 0:
-        ApiError(error_code=400, error_message='Preço invalido.')
+        ApiError(error_code=400, error_message='Preço inválido.')
     if not body.get('unidade') or len(body['unidade']) > 25:
-        ApiError(error_code=400, error_message='Unidade invalida.')
+        ApiError(error_code=400, error_message='Unidade inválida.')
     if body.get('estoqueMaximo') and body.get('estoqueMaximo') < 0:
-        ApiError(error_code=400, error_message='estoqueMaximo invalido.')
+        ApiError(error_code=400, error_message='Estoque Máximo inválido.')
     if body.get('estoqueMinimo') and body.get('estoqueMinimo') < 0:
-        ApiError(error_code=400, error_message='estoqueMinimo invalido.')
+        ApiError(error_code=400, error_message='Estoque Mínimo inválido.')
     if body.get('pontoReposicao') and body.get('pontoReposicao') < 0:
-        ApiError(error_code=400, error_message='pontoReposicao invalido.')
+        ApiError(error_code=400, error_message='Ponto Reposição inválido.')
 
     if body.get('estoqueMaximo') and body.get('estoqueMinimo') and body.get('estoqueMaximo') <= body.get(
             'estoqueMinimo'):
-        ApiError(error_code=400, error_message='Estoque máximo menor que estoque minimo')
+        ApiError(error_code=400, error_message='Estoque máximo menor que estoque mínimo')
     if body.get('estoqueMaximo') and body.get('pontoReposicao') and body.get('estoqueMaximo') <= body.get(
             'pontoReposicao'):
-        ApiError(error_code=400, error_message='Estoque máximo menor que ponto reposição')
+        ApiError(error_code=400, error_message='Estoque máximo menor que ponto de reposição')
     if body.get('pontoReposicao') and body.get('estoqueMinimo') and body.get('pontoReposicao') <= body.get(
             'estoqueMinimo'):
-        ApiError(error_code=400, error_message='Ponto reposição menor que estoque minimo')
+        ApiError(error_code=400, error_message='Ponto reposição menor que estoque mínimo')

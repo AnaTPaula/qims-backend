@@ -41,9 +41,9 @@ def options_id(administrador_id: int):
 def validate_request(body: dict, created: bool):
     if created:
         if not body.get('senha') or len(body['senha']) > 50:
-            ApiError(error_code=400, error_message='Senha invalida.')
+            ApiError(error_code=400, error_message='Senha inválida.')
     else:
         if body.get('senha') and len(body['senha']) > 50:
-            ApiError(error_code=400, error_message='Senha invalida.')
+            ApiError(error_code=400, error_message='Senha inválida.')
     if not body.get('nomeUsuario') or len(body['nomeUsuario']) > 50:
-        ApiError(error_code=400, error_message='NomeUsuario invalido.')
+        ApiError(error_code=400, error_message='Nome Usuário inválido.')
