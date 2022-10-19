@@ -75,7 +75,7 @@ def delete(empresa_id: int, operador_id: int):
 def options(empresa_id: str):
     response = make_response('{}', 200)
     response.headers['Access-Control-Allow-Origin'] = config.origin
-    response.headers['Access-Control-Allow-Methods'] = 'PUT, GET, DELETE, POST, OPTIONS'
+    response.headers['Access-Control-Allow-Methods'] = 'PUT, GET, DELETE, POST, PATCH, OPTIONS'
     response.headers['Access-Control-Allow-Headers'] = 'Origin, Accept, Content-Type, token'
     return response
 
@@ -83,7 +83,7 @@ def options(empresa_id: str):
 def options_id(empresa_id: str, operador_id: int):
     response = make_response('{}', 200)
     response.headers['Access-Control-Allow-Origin'] = config.origin
-    response.headers['Access-Control-Allow-Methods'] = 'PUT, GET, DELETE, POST, OPTIONS'
+    response.headers['Access-Control-Allow-Methods'] = 'PUT, GET, DELETE, POST, PATCH, OPTIONS'
     response.headers['Access-Control-Allow-Headers'] = 'Origin, Accept, Content-Type, token'
     return response
 
