@@ -29,7 +29,7 @@ def get(empresa_id: int, lote_id: int):
 
 
 @handler_exception
-@token_required(tipos=['operador'], acessos=['total'], validate_empresa=True)
+@token_required(tipos=['operador'], acessos=['total', 'modificar'], validate_empresa=True)
 def post(empresa_id: int, body: dict):
     logging.info('Criando Lote')
     validate_request(body=body)
