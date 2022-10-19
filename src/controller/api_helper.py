@@ -85,7 +85,7 @@ def validate_auth_token(jwt_payload,
             raise ApiError(error_code=401, error_message='Não autorizado.')
         if validate_situacao and payload.get('situacao') not in ['APROVADO']:
             raise ApiError(error_code=401, error_message='Não autorizado.')
-        if acessos and payload['acesso'] not in acessos:
+        if payload.get('tipo') == 'operador' and acessos and payload['acesso'] not in acessos:
             raise ApiError(error_code=401, error_message='Não autorizado.')
         if validate_operador and payload['tipo'] == 'operador' and payload['id'] != int(kwargs['operador_id']):
             raise ApiError(error_code=401, error_message='Não autorizado.')

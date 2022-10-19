@@ -10,7 +10,7 @@ config = get_config()
 
 
 @handler_exception
-@token_required(tipos=['empresa'], validate_empresa=True)
+@token_required(tipos=['empresa', 'operador'], acessos=['total'], validate_empresa=True)
 def search(empresa_id: int, body: dict):
     logging.info('Getting informações da conta')
     if body.get('tipo') and body['tipo'] == 'curva':
