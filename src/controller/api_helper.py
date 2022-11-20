@@ -91,6 +91,9 @@ def validate_auth_token(jwt_payload,
             raise ApiError(error_code=401, error_message='Não autorizado.')
 
         return payload
+    except HTTPException as err:
+        logging.error(err)
+        raise err
     except Exception as ex:
         logging.error(ex)
         raise ApiError(error_code=401, error_message='Não autorizado.')

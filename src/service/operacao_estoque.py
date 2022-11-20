@@ -1,6 +1,7 @@
 import logging
 
 from werkzeug.exceptions import HTTPException
+from uuid import uuid4
 
 from controller.api_helper import ApiError
 from model.empresa import query_one_empresa
@@ -8,7 +9,7 @@ from model.estoque import query_one_estoque
 from model.estoque_lote import execute_create_estoque_lote, execute_delete_estoque_lote, \
     query_all_lote_by_produto_estoque, query_one_lote, execute_update_lote, execute_delete_lote, \
     query_one_lote_by_produto_estoque, LoteHelper
-from model.historico import execute_create_historico
+from model.historico import execute_create_historico, query_one_historico, execute_delete_historico
 from model.lote import execute_create_lote, execute_update_lote
 from model.operador import query_one_operador
 from model.produto import query_one_prd
@@ -224,6 +225,68 @@ def move_estoque(body: dict, create_historico: bool = True):
             'empresaId': body['empresaId']
         }
         execute_create_historico(item=historico)
+
+
+def reverse_operacao(body: dict):
+    historico = query_one_historico(empresa_id=body['empresaId'], historico_id=body['historicoId'])
+    if historico['operacao'] == 'ENTRADA':
+        decrease_estoque(
+            body={
+                'empresaId': body['empresaId'],
+                'produtoId': historico['produto_fk'],
+                'estoqueId': historico['estoque_id'],
+                'quantidade': historico['quantidade'],
+                'usuarioId': historico['registro_operador']
+            },
+            create_historico=False
+        )
+        operador = query_one_operador(empresa_id=body['empresaId'], usuario_id=body['usuarioId'])
+        historico = {
+            'usuarioId': operador['id'],
+            'nomeOperador': operador['nome_usuario'],
+            'nomeEstoque': historico['nome_estoque'],
+            'estoqueId': historico['estoque_id'],
+            'quantidade': historico['quantidade'],
+            'operacao': 'ESTORNO_ENTRADA',
+            'nomeProduto': historico['nome_produto'],
+            'produtoId': historico['produto_fk'],
+            'empresaId': historico['empresa_fk']
+        }
+        execute_create_historico(item=historico)
+        execute_delete_historico(empresa_id=body['empresaId'], historico_id=body['historicoId'])
+    elif historico['operacao'] == 'SAIDA':
+        empresa = query_one_empresa(usuario_id=body['empresaId'])
+        lote_id = execute_create_lote(item={
+            'codigoLote': str(uuid4()),
+            'dataEntrada': historico['data_hora'],
+            'dataValidade': historico['data_hora'] if empresa['tipo_armazenagem'] == 'LIFO' else None,
+            'quantidade': historico['quantidade'],
+            'empresaId': historico['empresa_fk'],
+        })
+        increase_estoque(
+            body={
+                'empresaId': body['empresaId'],
+                'loteId': lote_id,
+                'estoqueId': historico['estoque_id'],
+                'produtoId': historico['produto_fk'],
+                'usuarioId': historico['registro_operador']
+            },
+            create_historico=False
+        )
+        operador = query_one_operador(empresa_id=body['empresaId'], usuario_id=body['usuarioId'])
+        historico = {
+            'usuarioId': operador['id'],
+            'nomeOperador': operador['nome_usuario'],
+            'nomeEstoque': historico['nome_estoque'],
+            'estoqueId': historico['estoque_id'],
+            'quantidade': historico['quantidade'],
+            'operacao': 'ESTORNO_SAIDA',
+            'nomeProduto': historico['nome_produto'],
+            'produtoId': historico['produto_fk'],
+            'empresaId': historico['empresa_fk']
+        }
+        execute_create_historico(item=historico)
+        execute_delete_historico(empresa_id=body['empresaId'], historico_id=body['historicoId'])
 
 
 def __increase_estoque_by_lote(lote: dict, body: dict):
