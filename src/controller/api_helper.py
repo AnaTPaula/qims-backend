@@ -18,6 +18,24 @@ def create_response(response: dict, status: int):
     return response
 
 
+def create_response_csv(response, status: int):
+    response = make_response(response, status)
+    response.headers['Content-Disposition'] = 'attachment; filename=relatorio.csv'
+    response.headers['Content-Type'] = 'text/csv'
+    response.headers['Access-Control-Allow-Origin'] = config.origin
+    response.headers['Access-Control-Allow-Credentials'] = True
+    return response
+
+
+def create_response_pdf(response, status: int):
+    response = make_response(response, status)
+    response.headers['Content-Disposition'] = 'attachment; filename=relatorio.pdf'
+    response.headers['Content-Type'] = 'text/pdf'
+    response.headers['Access-Control-Allow-Origin'] = config.origin
+    response.headers['Access-Control-Allow-Credentials'] = True
+    return response
+
+
 class ApiError(Exception):
     def __init__(self, error_code: int = 500, error_message: str = None):
         abort(error_code, description=error_message)

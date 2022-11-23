@@ -697,6 +697,47 @@ paths:
         "401":
           description: "Não autorizado"
 
+  /empresa/{empresa_id}/relatorio:
+    options:
+      x-swagger-router-controller: controller.relatorio
+      operationId: options_id
+      produces:
+        - "application/json"
+      parameters:
+        - in: "path"
+          name: "empresa_id"
+          required: true
+          type: "string"
+      summary: CORS suporte
+      description: Habilita o CORS retornando os cabeçalhos corretos
+      responses:
+        200:
+          description: Metodo generico para CORS
+    post:
+      x-swagger-router-controller: controller.relatorio
+      operationId: search
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "path"
+          name: "empresa_id"
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            type: object
+      responses:
+        "200":
+          description: "Ok"
+        "400":
+          description: "Request Inválida"
+        "401":
+          description: "Não autorizado"
+
   /empresa/{empresa_id}/operador:
     options:
       x-swagger-router-controller: controller.operador
