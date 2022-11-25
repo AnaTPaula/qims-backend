@@ -1,12 +1,11 @@
 import logging
-import pandas as pd
 
 from flask import make_response
 from xhtml2pdf import pisa
 from io import StringIO, BytesIO
 
 from config import get_config
-from controller.api_helper import handler_exception, create_response, token_required, create_response_pdf, create_response_csv
+from controller.api_helper import handler_exception, token_required, create_response_pdf, create_response_csv
 from service.relatorio import saida_produto, entrada_produto, estoque_quantidade, produto_quantidade
 
 config = get_config()
@@ -27,11 +26,10 @@ def search(empresa_id: int, body: dict):
     elif body['tipo'] == 'produto_quantidade':
         response = produto_quantidade(body=body)
 
-    df = pd.DataFrame.from_dict({'col_1': [3,2,1,0]})
     if body['arquivo'] == 'csv':
-        return create_response_csv(response=df.to_csv(), status=200)
+        return create_response_csv(response=response.to_csv(), status=200)
     else:
-        html = df.to_html().replace('<td>', '<td align="center">')
+        html = response.to_html().replace('<td>', '<td align="center">')
         pdf = BytesIO()
         pisa.CreatePDF(StringIO(html),pdf)
         resp = pdf.getvalue()

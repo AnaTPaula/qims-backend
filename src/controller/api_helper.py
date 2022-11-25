@@ -30,7 +30,7 @@ def create_response_csv(response, status: int):
 def create_response_pdf(response, status: int):
     response = make_response(response, status)
     response.headers['Content-Disposition'] = 'attachment; filename=relatorio.pdf'
-    response.headers['Content-Type'] = 'text/pdf'
+    response.headers['Content-Type'] = 'application/pdf'
     response.headers['Access-Control-Allow-Origin'] = config.origin
     response.headers['Access-Control-Allow-Credentials'] = True
     return response
