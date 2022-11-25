@@ -33,7 +33,7 @@ def query_all_lote_grouped(empresa_id: int, codigo_lote: str):
 
 
 def query_all_lote(empresa_id: int, codigo_lote: str):
-    query = "SELECT l.*, el.produto_estoque_fk, p.nome from lote l left join estoque_lote el on el.lote_fk = l.id " \
+    query = "select l.*, el.produto_estoque_fk, p.nome from lote l left join estoque_lote el on el.lote_fk = l.id " \
             "left join produto_estoque pe on pe.id = el.produto_estoque_fk left join produto p on p.id = pe.produto_fk " \
             "where l.empresa_fk = %s "
     if codigo_lote:
