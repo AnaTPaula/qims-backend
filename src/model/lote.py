@@ -12,7 +12,7 @@ class LoteHelper:
             'dataValidade': item.get('data_validade'),
             'quantidade': item.get('quantidade'),
             'empresaId': item.get('empresa_fk'),
-            'ProdutoNome': item.get('nome'),
+            'produtoNome': item.get('nome'),
             'associado': True if item.get('produto_estoque_fk') else False,
         }
 
