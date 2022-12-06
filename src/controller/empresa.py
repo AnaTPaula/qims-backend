@@ -1,4 +1,5 @@
 import logging
+import re
 
 from flask import make_response
 
@@ -109,3 +110,17 @@ def validate_request(body: dict, created: bool):
         ApiError(error_code=400, error_message='Nome do usuário inválido.')
     if not body.get('razaoSocial') or len(body['razaoSocial']) > 50:
         ApiError(error_code=400, error_message='Razao social inválido.')
+    if body.get('senha'):
+        validate_password(senha=body['senha'])
+
+def validate_password(senha: str):
+    if len(senha) < 8:
+        ApiError(error_code=400, error_message='A senha deve ter pelo menos 8 caracteres.')
+    elif not re.search("[0-9]", senha):
+        ApiError(error_code=400, error_message='A senha deve conter pelo menos 1 número.')
+    elif not re.search("[a-z]", senha):
+        ApiError(error_code=400, error_message='A senha deve ter pelo menos um caractere minúsculo.')
+    elif not re.search("[A-Z]", senha):
+        ApiError(error_code=400, error_message='A senha deve ter pelo menos um caractere maiúsculo.')
+    elif senha.isalnum():
+        ApiError(error_code=400, error_message='A senha deve conter pelo menos 1 caractere especial.')

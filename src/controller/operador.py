@@ -1,4 +1,5 @@
 import logging
+import re
 
 from flask import make_response
 
@@ -55,6 +56,8 @@ def patch(empresa_id: int, operador_id: int, body: dict):
     logging.info('Atualizando senha Operador')
     if not body.get('senha') or len(body['senha']) > 50:
         ApiError(error_code=400, error_message='Senha invalida.')
+    if body.get('senha'):
+        validate_password(senha=body['senha'])
     body['empresaId'] = empresa_id
     body['id'] = operador_id
     response = update_senha(body=body)
@@ -99,3 +102,18 @@ def validate_request(body: dict, created: bool):
         ApiError(error_code=400, error_message='Nome do usuário inválido.')
     if not body.get('tipoAcesso') or body['tipoAcesso'] not in ['total', 'modificar', 'leitura']:
         ApiError(error_code=400, error_message='Tipo de acesso inválido.')
+    if body.get('senha'):
+        validate_password(senha=body['senha'])
+
+
+def validate_password(senha: str):
+    if len(senha) < 8:
+        ApiError(error_code=400, error_message='A senha deve ter pelo menos 8 caracteres.')
+    elif not re.search("[0-9]", senha):
+        ApiError(error_code=400, error_message='A senha deve conter pelo menos 1 número.')
+    elif not re.search("[a-z]", senha):
+        ApiError(error_code=400, error_message='A senha deve ter pelo menos um caractere minúsculo.')
+    elif not re.search("[A-Z]", senha):
+        ApiError(error_code=400, error_message='A senha deve ter pelo menos um caractere maiúsculo.')
+    elif senha.isalnum():
+        ApiError(error_code=400, error_message='A senha deve conter pelo menos 1 caractere especial.')
